@@ -1,0 +1,1343 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Vue 入門課本</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Noto+Sans+TC:wght@400;500;700&display=swap">
+<style>
+/* 版面：左側固定目錄＋右側單欄講義（手機改成頂部可收合目錄）。配色沿用題庫網頁，兩邊看起來是同一套。 */
+:root{
+  --bg:#f6f7f9; --card:#ffffff; --text:#1d2330; --muted:#5b6475; --line:#dde1e8;
+  --accent:#1f7a4d; --accent-soft:#e4f3ea; --code-bg:#f1f3f6; --code-text:#1f3a5f; --comment:#6a7486;
+  --ok:#17803d; --ok-bg:#e6f5ec; --bad:#b4232c; --bad-bg:#fbeaea; --warn:#9a5b00; --warn-bg:#fdf3e1;
+  --f-body:"Noto Sans TC",-apple-system,BlinkMacSystemFont,"PingFang TC","Microsoft JhengHei",sans-serif;
+  --f-code:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#11141a; --card:#1a1f28; --text:#e4e8ef; --muted:#9aa4b5; --line:#2c3340;
+  --accent:#5ccf92; --accent-soft:#163024; --code-bg:#0c0f14; --code-text:#a8d8ff; --comment:#7d8799;
+  --ok:#5fd18a; --ok-bg:#15301f; --bad:#ff8a8a; --bad-bg:#3a1a1c; --warn:#f0b45a; --warn-bg:#352812;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#11141a; --card:#1a1f28; --text:#e4e8ef; --muted:#9aa4b5; --line:#2c3340;
+  --accent:#5ccf92; --accent-soft:#163024; --code-bg:#0c0f14; --code-text:#a8d8ff; --comment:#7d8799;
+  --ok:#5fd18a; --ok-bg:#15301f; --bad:#ff8a8a; --bad-bg:#3a1a1c; --warn:#f0b45a; --warn-bg:#352812;
+  color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
+body{background:var(--bg);color:var(--text);font:16px/1.8 var(--f-body)}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.wrap{display:grid;grid-template-columns:240px minmax(0,1fr);gap:40px;max-width:1080px;margin:0 auto;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:32px 80px}
+nav.toc{position:sticky;top:calc(env(safe-area-inset-top, 0px) + 24px);align-self:start;max-height:calc(100vh - 48px);overflow:auto;font-size:14px}
+.toc summary{font-weight:700;cursor:pointer;list-style:none;padding:4px 0}
+.toc summary::-webkit-details-marker{display:none}
+.toc ol{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:2px}
+.toc a{display:flex;gap:8px;align-items:baseline;text-decoration:none;color:var(--muted);padding:5px 8px;border-radius:6px}
+.toc a:hover{background:var(--accent-soft);color:var(--text)}
+.toc a.on{color:var(--accent);background:var(--accent-soft);font-weight:500}
+.toc .no{font-family:var(--f-code);font-size:12px;min-width:1.6em}
+.toc .done{margin-left:auto;color:var(--ok);font-size:12px}
+.toc .prog{color:var(--muted);font-size:13px;margin-top:10px}
+main{min-width:0;max-width:44em}
+header.top h1{font-size:30px;line-height:1.3;margin:0 0 8px;text-wrap:balance}
+header.top p{color:var(--muted);margin:0 0 6px}
+.how{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px 20px;margin:24px 0 8px}
+.how h2{font-size:17px;margin:0 0 6px}
+.how ol{margin:0;padding-left:1.3em}
+section.ch{padding-top:48px}
+section.ch>h2{font-size:24px;line-height:1.35;margin:0 0 4px;text-wrap:balance;display:flex;gap:12px;align-items:baseline}
+section.ch>h2 .no{font-family:var(--f-code);font-size:15px;color:var(--accent);font-weight:600}
+.lead{color:var(--muted);margin:0 0 18px}
+h3{font-size:18px;margin:32px 0 6px;text-wrap:balance}
+p{margin:8px 0}
+ul.pts{padding-left:1.2em;margin:8px 0}
+ul.pts li{margin:4px 0}
+code{font-family:var(--f-code);font-size:.88em;background:var(--code-bg);color:var(--code-text);padding:1px 5px;border-radius:4px;overflow-wrap:anywhere}
+.code{margin:12px 0;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--code-bg)}
+.code .lab{font-size:12px;font-weight:600;padding:4px 12px;border-bottom:1px solid var(--line);color:var(--muted);letter-spacing:.04em}
+.code.run .lab,.code.compile .lab{color:var(--ok)}
+.code.cerr .lab{color:var(--bad)}
+.code.rerr .lab{color:var(--warn)}
+.code pre{margin:0;padding:12px 14px;overflow-x:auto;font:13.5px/1.65 var(--f-code);color:var(--code-text)}
+.code pre .c{color:var(--comment)}
+.code pre .r{color:var(--accent);font-weight:600}
+.code pre .e{color:var(--bad)}
+.code pre .w{color:var(--warn)}
+.out{border-top:1px dashed var(--line);background:var(--card)}
+.out .lab{border:0;color:var(--muted)}
+.out pre{padding-top:0;color:var(--text)}
+.box{border-radius:8px;padding:12px 16px;margin:14px 0}
+.box .t{font-size:13px;font-weight:700;letter-spacing:.05em;display:block;margin-bottom:2px}
+.box.key{background:var(--accent-soft)} .box.key .t{color:var(--accent)}
+.box.trap{background:var(--warn-bg)} .box.trap .t{color:var(--warn)}
+.box p:last-child,.box ul:last-child{margin-bottom:0}
+.tbl{overflow-x:auto;margin:12px 0}
+table{border-collapse:collapse;font-size:14.5px;min-width:100%}
+th,td{border:1px solid var(--line);padding:6px 10px;text-align:left;vertical-align:top}
+th{background:var(--code-bg);font-weight:600}
+td.y{color:var(--ok);font-weight:600} td.n{color:var(--bad);font-weight:600}
+.next{margin-top:28px;border:1px solid var(--line);background:var(--card);border-radius:10px;padding:16px 20px;display:grid;gap:10px}
+.next .t{font-weight:700}
+.next .nums{font-family:var(--f-code);font-size:14px;color:var(--muted);word-break:break-word}
+.next label{display:flex;gap:8px;align-items:center;cursor:pointer;font-weight:500}
+.next input{width:18px;height:18px;accent-color:var(--accent)}
+.mobile-only{display:none}
+.secq{margin:28px 0 8px;border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);border-radius:10px;padding:14px 18px}
+.secq-h{display:flex;flex-wrap:wrap;gap:4px 12px;align-items:baseline;margin-bottom:6px}
+.secq-h span{font-weight:700;color:var(--accent)}
+.secq-h small{color:var(--muted);font-size:13.5px}
+.iq+.iq{border-top:1px dashed var(--line);margin-top:18px;padding-top:14px}
+.iq .btnrow{margin-top:8px}
+@media (max-width: 820px){
+  .wrap{grid-template-columns:minmax(0,1fr);gap:0;padding-block:16px 64px}
+  nav.toc{position:static;max-height:none;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 14px;margin-bottom:20px}
+  header.top h1{font-size:25px}
+  section.ch>h2{font-size:21px}
+}
+/* ---- 課本與題目 ---- */
+.toc .home{display:block;font-weight:700;color:var(--text);padding:4px 8px;margin-bottom:4px;text-decoration:none;border-radius:6px}
+.toc a.off{opacity:.55;cursor:default;pointer-events:none}
+.toc .cnt{margin-left:auto;font:12px var(--f-code);color:var(--muted);font-variant-numeric:tabular-nums}
+.toc ul.secs{list-style:none;margin:2px 0 6px 12px;padding:0 0 0 10px;border-left:1px solid var(--line);display:grid;gap:1px}
+.toc ul.secs a{display:block;padding:3px 6px;font-size:13px;line-height:1.45}
+h4{font-size:16px;margin:24px 0 4px}
+.chhead{padding-top:8px}
+.chhead .no{font:600 14px var(--f-code);color:var(--accent)}
+.chhead h2{font-size:26px;line-height:1.35;margin:2px 0 14px;text-wrap:balance}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:20px}
+.tabs button{font:500 15px var(--f-body);background:none;border:0;border-bottom:2px solid transparent;color:var(--muted);padding:8px 14px;margin-bottom:-1px;cursor:pointer}
+.tabs button[aria-selected="true"]{color:var(--accent);border-bottom-color:var(--accent)}
+.chapter h3{scroll-margin-top:16px}
+ol.flow{list-style:none;margin:14px 0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px;counter-reset:f}
+ol.flow li{position:relative;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-size:14.5px;min-width:0}
+ol.flow li b{display:block}
+ol.flow li span{color:var(--muted);line-height:1.6;display:block}
+ol.flow li:not(:last-child)::after{content:"→";position:absolute;right:-18px;top:40%;color:var(--accent);font-weight:700}
+.btn{font:500 15px var(--f-body);border:1px solid var(--line);background:var(--card);color:var(--text);border-radius:8px;padding:8px 16px;cursor:pointer}
+.btn:hover{border-color:var(--accent)}
+.btn.main{background:var(--accent);border-color:var(--accent);color:var(--bg)}
+.btn:disabled{opacity:.5;cursor:default}
+.btnrow{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+.toquiz{margin-top:32px}
+.chlist{list-style:none;margin:16px 0;padding:0;border-top:1px solid var(--line)}
+.chlist li{border-bottom:1px solid var(--line)}
+.chlist a,.chlist .row{display:grid;grid-template-columns:2.4em minmax(0,1fr) auto;gap:8px;padding:12px 4px;text-decoration:none;color:var(--text);align-items:baseline}
+.chlist a:hover{background:var(--accent-soft)}
+.chlist .row{opacity:.55}
+.chlist .n{font:600 14px var(--f-code);color:var(--accent)}
+.chlist small{display:block;color:var(--muted);font-size:13.5px}
+.chlist .st{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+.qbar{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:baseline;font-size:14px;color:var(--muted);font-variant-numeric:tabular-nums}
+.qbar b{color:var(--text)}
+.grid{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:4px;margin:10px 0 22px}
+.grid button{font:12px var(--f-code);height:30px;padding:0;border:1px solid var(--line);background:var(--card);color:var(--muted);border-radius:4px;cursor:pointer;font-variant-numeric:tabular-nums}
+.grid button.ok{background:var(--ok-bg);color:var(--ok);border-color:transparent}
+.grid button.no{background:var(--bad-bg);color:var(--bad);border-color:transparent}
+.grid button.cur{outline:2px solid var(--accent);outline-offset:1px}
+.qtag{font-size:13px;color:var(--accent);font-weight:600}
+.qtext{font-size:17px;font-weight:500;margin:4px 0 12px}
+.opts{display:grid;gap:8px;margin:12px 0}
+.opt{display:grid;grid-template-columns:1.6em minmax(0,1fr);gap:6px;text-align:left;font:15.5px/1.6 var(--f-body);color:var(--text);background:var(--card);border:1px solid var(--line);border-radius:8px;padding:10px 12px;cursor:pointer;width:100%}
+.opt:hover:not(:disabled){border-color:var(--accent)}
+.opt:disabled{cursor:default;color:var(--text)}
+.opt .L{font:600 14px/1.75 var(--f-code);color:var(--muted)}
+.opt>span:last-child{min-width:0;overflow-wrap:anywhere}
+.opt.sel{border-color:var(--accent);background:var(--accent-soft)}
+.opt.right{border-color:var(--ok);background:var(--ok-bg)}
+.opt.wrong{border-color:var(--bad);background:var(--bad-bg)}
+.opt .why{display:block;font-size:14px;color:var(--muted);margin-top:2px}
+.verdict{font-weight:700;margin:14px 0 4px}
+.verdict.ok{color:var(--ok)} .verdict.no{color:var(--bad)}
+.exp h5{font-size:13px;letter-spacing:.05em;color:var(--accent);margin:14px 0 2px}
+.exp p{margin:2px 0}
+.hint{color:var(--muted);font-size:14.5px;margin-top:6px}
+.linkbtn{background:none;border:0;padding:0;font:inherit;color:var(--accent);text-decoration:underline;cursor:pointer}
+.tagtbl td:nth-child(2){font-variant-numeric:tabular-nums;white-space:nowrap}
+.bigscore{font:600 34px var(--f-code);margin:4px 0}
+@media (max-width: 820px){
+  ol.flow{grid-template-columns:minmax(0,1fr);gap:18px}
+  ol.flow li:not(:last-child)::after{content:"↓";right:auto;left:50%;top:auto;bottom:-20px}
+  .grid button{height:32px}
+}
+.btn.reset{margin-left:auto}
+.tabs .tabreset{margin-left:auto;align-self:center;font:500 13px var(--f-body);background:none;border:1px solid var(--line);border-radius:6px;color:var(--muted);padding:4px 10px;cursor:pointer}
+.tabs .tabreset:hover{color:var(--accent);border-color:var(--accent)}
+
+/* HTML 範例：程式碼＋即時畫面，可直接改 */
+.code.html .bar{display:flex;align-items:center;gap:8px;padding:4px 8px 4px 12px;border-bottom:1px solid var(--line)}
+.code.html .bar .lab{border:0;padding:0;flex:1}
+.code.html .bar button{font:12px var(--f-body);padding:2px 10px;border:1px solid var(--line);border-radius:4px;background:var(--card);color:var(--text);cursor:pointer}
+.code.html pre[contenteditable]{outline:2px dashed var(--accent);outline-offset:-2px;background:var(--card)}
+.preview{border-top:1px dashed var(--line);background:var(--card)}
+.preview .lab{border:0;color:var(--muted)}
+.preview iframe{display:block;width:100%;height:60px;border:0;background:#fff;color-scheme:light}
+.code pre .tg{color:var(--accent)}
+
+</style>
+<div class="wrap">
+<nav class="toc" aria-label="目錄">
+  <details id="tocBox" open>
+    <summary>目錄</summary>
+    <a class="home" href="#home" data-go="home">Vue 入門課本</a>
+    <ol id="tocList"></ol>
+  </details>
+</nav>
+<main id="main">
+<section id="home">
+  <header class="top">
+    <h1>Vue 入門課本</h1>
+    <p>給完全沒寫過程式的人。先學網頁的三個基本功：HTML、CSS、JavaScript，再學 Vue，最後自己做出一個小記帳網頁。</p>
+    <p>HTML 範例旁邊會直接顯示畫面，按「改改看」就能自己改程式碼、馬上看到結果。</p>
+  </header>
+  <div class="how">
+    <h2>怎麼念</h2>
+    <ol>
+      <li>一次念一節就好，不用一口氣念完一章。</li>
+      <li>看到程式碼，先猜結果，再看下面的畫面或輸出。</li>
+      <li>每個 HTML 範例都按「改改看」動手改一點，改壞了按「還原」。</li>
+            <li>每節最後有 1～2 題隨堂練習，念完那一節馬上做，確認有沒有讀懂。</li>
+      <li>念完一章再做章末練習（隨堂練習的題目也在裡面）。答錯時，解析下面有連結可以回到對應的小節。</li>
+      <li>做題進度存在這個瀏覽器，換裝置不會跟著走。</li>
+    </ol>
+  </div>
+  <ul class="chlist" id="chList"></ul>
+</section>
+<section id="chapterView" hidden>
+  <div class="chhead">
+    <span class="no" id="chNo"></span>
+    <h2 id="chTitle"></h2>
+    <div class="tabs" role="tablist">
+      <button id="tabText" role="tab" data-tab="text">課文</button>
+      <button id="tabQuiz" role="tab" data-tab="quiz">章末練習</button>
+      <button class="tabreset" id="resetAll" hidden>全部重新開始</button>
+    </div>
+  </div>
+  <div id="textPane">
+<article class="chapter" id="text0" hidden><p class="lead">這一章還不教程式，只做準備。念完你會：知道網頁是由哪幾種東西組成的、裝好寫網頁要用的兩個軟體、自己做出第一個網頁檔並用瀏覽器打開，還會打開瀏覽器內建的「開發者工具」。後面每一章都會用到這一章的步驟。</p>
+
+<h3 id="s0-1">0.1 網頁是由什麼組成的</h3>
+<p>你每天在瀏覽器（Chrome、Edge、Safari）裡看到的網頁，其實都是一份份文字檔。瀏覽器讀這些文字，照裡面寫的內容把畫面畫出來。</p>
+<p>這些文字分成三種，各管一件事：</p>
+<div class="tbl"><table>
+<tr><th>名稱</th><th>管什麼</th><th>比喻（蓋房子）</th><th>本書哪裡教</th></tr>
+<tr><td><b>HTML</b></td><td>網頁上<b>有什麼</b>：標題、文字、圖片、按鈕</td><td>房子的骨架和隔間</td><td>第 1 章</td></tr>
+<tr><td><b>CSS</b></td><td>東西<b>長什麼樣</b>：顏色、大小、位置</td><td>油漆和裝潢</td><td>第 2 章</td></tr>
+<tr><td><b>JavaScript</b></td><td>東西<b>會做什麼</b>：按下按鈕後發生什麼事</td><td>水電，讓燈會亮、門鈴會響</td><td>第 3～7 章</td></tr>
+</table></div>
+<p><b>Vue</b> 不是第四種語言。它是用 JavaScript 寫好的一套工具，讓你寫「會動的網頁」時輕鬆很多。所以要先學會前面三種，才學得懂 Vue。第 8 章開始才會用到 Vue。</p>
+<div class="box key"><span class="t">重點</span><p>一般的網頁，HTML 一定要有，CSS 和 JavaScript 可以沒有。只有 HTML 的網頁也能看，只是樣子很陽春、不會動。</p></div>
+<h4>這本書的範例怎麼看</h4>
+<p>書裡的 HTML 範例會像下面這樣：上半部是程式碼，下半部的「畫面」是瀏覽器照這段程式碼畫出來的結果。</p>
+<div class="code html"><div class="bar"><span class="lab">第一個範例</span><button data-edit>改改看</button><button data-undo hidden>還原</button></div><pre tabindex="0">&lt;h1&gt;你好&lt;/h1&gt;
+&lt;p&gt;這是我的第一個網頁。&lt;/p&gt;</pre><div class="preview"><div class="lab">畫面</div><iframe title="第一個範例 的畫面" sandbox="allow-scripts allow-same-origin allow-popups" loading="lazy"></iframe></div></div>
+
+<p>現在還不用看懂程式碼。先試一下右上角的「<b>改改看</b>」按鈕：</p>
+<ol class="pts">
+<li>按「改改看」，程式碼的框會出現虛線，表示可以打字了。</li>
+<li>把 <code>你好</code> 改成你的名字。</li>
+<li>看下面的「畫面」，大約半秒後就會跟著變。</li>
+<li>改壞了也沒關係，按「<b>還原</b>」就會回到原本的樣子。</li>
+</ol>
+<p>你在書裡改的東西不會被存起來，重新整理頁面就會回到原樣。要留下來的作品，要照 0.3 節的方法存成自己的檔案。</p>
+<div class="secq" data-ch="0" data-isec="s0-1"></div>
+<h3 id="s0-2">0.2 安裝兩個軟體：瀏覽器和 VS Code</h3>
+<p>寫網頁只需要兩個軟體：</p>
+<div class="tbl"><table>
+<tr><th>軟體</th><th>做什麼</th><th>比喻</th></tr>
+<tr><td><b>瀏覽器</b></td><td>打開網頁檔，把畫面畫出來；也用來找錯</td><td>電視機</td></tr>
+<tr><td><b>VS Code</b></td><td>打程式碼、存檔的文字編輯器</td><td>紙和筆</td></tr>
+</table></div>
+<h4>瀏覽器</h4>
+<p>本書用 <b>Google Chrome</b> 說明。Windows 內建的 <b>Edge</b> 和 Chrome 是同一個核心做的，畫面和按鍵幾乎一樣，用 Edge 也可以。Mac 內建的 Safari 也能看網頁，但 0.5 節的開發者工具要另外打開設定，所以建議另外裝 Chrome。</p>
+<ol class="pts">
+<li>到 <a href="https://www.google.com/chrome/" target="_blank" rel="noopener">Chrome 下載頁</a>，按「下載 Chrome」。</li>
+<li>Mac：打開下載的 <code>googlechrome.dmg</code>，把 Chrome 圖示拖到「應用程式」資料夾。</li>
+<li>Windows：雙擊下載的安裝檔，等它自己裝完。</li>
+</ol>
+<h4>VS Code</h4>
+<p><b>VS Code</b>（Visual Studio Code）是微軟出的免費編輯器，現在寫網頁的人大多用它。它會幫程式碼上色、自動補字，比電腦內建的記事本好用很多。</p>
+<ol class="pts">
+<li>到 <a href="https://code.visualstudio.com/" target="_blank" rel="noopener">VS Code 官網</a>，按下載按鈕。網站會自動選你的作業系統。</li>
+<li>Mac：下載的是一個 <code>.zip</code>，雙擊解開後會出現 <b>Visual Studio Code</b> 圖示，把它拖到「應用程式」資料夾。</li>
+<li>Windows：雙擊下載的安裝檔，選「我同意」，其他一路按「下一步」到裝完。</li>
+</ol>
+<p>VS Code 一開始是英文介面。想換成中文：打開 VS Code，按左邊一排圖示裡的「方塊」圖示（Extensions，擴充功能），搜尋 <code>Chinese (Traditional)</code>，安裝第一個結果，再照右下角的提示重新啟動。不換也完全不影響學習，本書提到選單時會中英文都寫。</p>
+<div class="box trap"><span class="t">陷阱</span><p>不要用 Mac 的「文字編輯」（TextEdit）或 Word 寫網頁。它們存檔時會偷偷加上排版資料，瀏覽器讀到的就不是你打的那些字了。Windows 的「記事本」雖然可以用，但很容易存成 <code>.txt</code>（下一節會講），也沒有上色和自動補字。</p></div>
+<div class="secq" data-ch="0" data-isec="s0-2"></div>
+<h3 id="s0-3">0.3 做出第一個網頁檔</h3>
+<h4>第一步：建一個資料夾</h4>
+<p>先在電腦上建一個資料夾，之後的練習都放在這裡。例如在「文件」裡建一個叫 <code>vue-book</code> 的資料夾。</p>
+<p>資料夾和檔案名稱建議只用<b>英文小寫、數字和 <code>-</code></b>，不要用中文和空白。現在用中文還不會出問題，但第 15 章開始用的工具，遇到中文或空白的路徑偶爾會出錯，從一開始就養成習慣比較省事。</p>
+<h4>第二步：用 VS Code 打開這個資料夾</h4>
+<ol class="pts">
+<li>打開 VS Code，選上方選單 <b>File → Open Folder…</b>（檔案 → 開啟資料夾），選剛剛的 <code>vue-book</code>。</li>
+<li>如果跳出「Do you trust the authors…」（是否信任這個資料夾的作者），按 <b>Yes, I trust the authors</b>。這是你自己建的資料夾，可以信任。</li>
+<li>左邊會出現檔案總管，最上面寫著 <code>VUE-BOOK</code>。</li>
+</ol>
+<h4>第三步：新增檔案 index.html</h4>
+<ol class="pts">
+<li>把滑鼠移到左邊的 <code>VUE-BOOK</code> 上，會出現幾個小圖示，按第一個「New File…」（新增檔案）。</li>
+<li>輸入檔名 <code>index.html</code>，按 Enter。右邊會打開這個空白檔案。</li>
+<li>在檔案裡打一個驚嘆號 <code>!</code>，等一下會跳出提示選單，按 <b>Enter</b>（或 Tab）。</li>
+</ol>
+<p>VS Code 會自動幫你填好一整份網頁的基本架構，叫做「樣板」：</p>
+<div class="code plain"><div class=lab>HTML</div><pre tabindex="0">&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Document&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;</pre></div>
+
+<p>每一行是什麼意思，第 1 章 1.2 節會一行一行講。現在只要知道：<b>要顯示在網頁上的東西，寫在 <code>&lt;body&gt;</code> 和 <code>&lt;/body&gt;</code> 中間</b>。</p>
+<p>把游標移到 <code>&lt;body&gt;</code> 下面那個空行，打上：</p>
+<div class="code plain"><div class=lab>HTML</div><pre tabindex="0">&lt;h1&gt;我的第一個網頁&lt;/h1&gt;
+&lt;p&gt;今天開始學寫網頁。&lt;/p&gt;</pre></div>
+
+<p>然後存檔：Mac 按 <b>Cmd＋S</b>，Windows 按 <b>Ctrl＋S</b>。</p>
+<div class="box trap"><span class="t">陷阱</span><p>沒存檔的檔案，VS Code 上方的檔名標籤旁邊會有一個<b>白色圓點</b>，存好之後圓點會變回 ×。瀏覽器讀的是存在硬碟裡的檔案，沒存檔的話，你打的字瀏覽器根本看不到。初學者最常見的「我改了怎麼沒變」，九成是忘了存檔。</p></div>
+<h4>第四步：用瀏覽器打開</h4>
+<p>到資料夾裡找到 <code>index.html</code>，雙擊它，電腦會用預設的瀏覽器打開。也可以直接把檔案拖進瀏覽器視窗。</p>
+<p>打開後看瀏覽器上方的網址列，會看到類似這樣的網址，表示瀏覽器讀的是你電腦裡的檔案，不是網路上的：</p>
+<div class="code plain"><pre tabindex="0">file:/<span class="c">//Users/你的名字/Documents/vue-book/index.html          ← Mac</span>
+file:/<span class="c">//C:/Users/你的名字/Documents/vue-book/index.html       ← Windows</span></pre></div>
+
+<h4>Windows 的副檔名陷阱</h4>
+<p>檔名最後面的 <code>.html</code> 叫<b>副檔名</b>，電腦靠它判斷這是什麼檔。Windows 預設會<b>把副檔名藏起來</b>，所以你看到的檔名 <code>index.html</code> 可能其實是 <code>index.html.txt</code>，瀏覽器就會把它當成純文字，直接把你打的程式碼原封不動顯示出來。</p>
+<p>用 VS Code 建檔通常不會發生這種事，但用其他方式建檔就很常見。建議先讓 Windows 把副檔名顯示出來：</p>
+<ul class="pts">
+<li><b>Windows 11</b>：打開檔案總管，按上方的「檢視」→「顯示」→ 勾選「副檔名」。</li>
+<li><b>Windows 10</b>：打開檔案總管，按上方的「檢視」分頁，勾選「副檔名」。</li>
+</ul>
+<p>Mac 的 Finder 也可能隱藏副檔名。要顯示的話：Finder 上方選單「Finder → 設定 → 進階」，勾選顯示副檔名的那一項（英文介面寫 Show all filename extensions）。</p>
+<div class="box key"><span class="t">重點</span><p>打開網頁卻看到一整片程式碼（連 <code>&lt;h1&gt;</code> 都顯示出來），先檢查副檔名是不是 <code>.html</code>。</p></div>
+<div class="secq" data-ch="0" data-isec="s0-3"></div>
+<h3 id="s0-4">0.4 改程式的循環：改 → 存 → 重新整理</h3>
+<p>寫網頁的日常，就是一直重複這三步：</p>
+<ol class="flow">
+<li><b>改</b><span>在 VS Code 改程式碼</span></li>
+<li><b>存</b><span>Mac 按 Cmd＋S，Windows 按 Ctrl＋S</span></li>
+<li><b>重新整理</b><span>回到瀏覽器，Mac 按 Cmd＋R，Windows 按 F5 或 Ctrl＋R</span></li>
+</ol>
+<p>瀏覽器只在「打開」或「重新整理」的那一刻讀檔案。之後你再怎麼改檔案、存檔，瀏覽器畫面都不會自己變，要按重新整理它才會重讀一次。</p>
+<p>動手試一次：把 <code>index.html</code> 裡的「我的第一個網頁」改成「我的網頁」→ 存檔 → 回瀏覽器重新整理，確認標題變了。</p>
+<div class="tbl"><table>
+<tr><th>你做了什麼</th><th>瀏覽器畫面會變嗎</th><th>為什麼</th></tr>
+<tr><td>改了，沒存檔，按重新整理</td><td>不會</td><td>硬碟裡的檔案還是舊的</td></tr>
+<tr><td>改了，存檔，沒按重新整理</td><td>不會</td><td>瀏覽器還沒重新讀檔</td></tr>
+<tr><td>改了，存檔，按重新整理</td><td>會</td><td>三步都做了</td></tr>
+</table></div>
+<p>覺得每次都要按存檔很麻煩，可以打開 VS Code 的自動存檔：選單 <b>File → Auto Save</b>（檔案 → 自動儲存），前面出現勾勾就表示開了。開了以後只剩「改」和「重新整理」兩步。</p>
+<div class="box key"><span class="t">重點</span><p>第 15 章會用到一套工具，存檔後瀏覽器會自己更新，連重新整理都不用按。在那之前，記住「改 → 存 → 重新整理」。</p></div>
+<div class="secq" data-ch="0" data-isec="s0-4"></div>
+<h3 id="s0-5">0.5 瀏覽器的開發者工具</h3>
+<p>每個瀏覽器都內建一套給寫網頁的人用的工具，叫<b>開發者工具</b>（DevTools）。它可以讓你看到網頁背後的結構、找出錯誤，之後每一章都會用到。</p>
+<h4>怎麼打開</h4>
+<div class="tbl"><table>
+<tr><th>方法</th><th>Mac</th><th>Windows</th></tr>
+<tr><td>快速鍵</td><td><b>Cmd＋Option＋I</b></td><td><b>F12</b> 或 <b>Ctrl＋Shift＋I</b></td></tr>
+<tr><td>用滑鼠</td><td colspan="2">在網頁上按右鍵 → 選「<b>檢查</b>」</td></tr>
+</table></div>
+<p>打開後，視窗旁邊（或下面）會多出一塊區域，上面有一排分頁。現在只要認識其中兩個：</p>
+<div class="tbl"><table>
+<tr><th>分頁</th><th>看什麼</th><th>什麼時候用</th></tr>
+<tr><td><b>Elements</b>（元素）</td><td>網頁的 HTML 結構，以及每個東西套了哪些 CSS</td><td>第 1、2 章：畫面跟想的不一樣時</td></tr>
+<tr><td><b>Console</b>（主控台）</td><td>JavaScript 印出來的訊息和錯誤</td><td>第 3 章起：程式跑不出來時</td></tr>
+</table></div>
+<h4>試試 Elements</h4>
+<p>打開你的 <code>index.html</code>，再打開開發者工具，點 <b>Elements</b>。你會看到剛才打的 <code>&lt;h1&gt;</code> 和 <code>&lt;p&gt;</code>。把滑鼠移到 <code>&lt;h1&gt;</code> 那一行，網頁上的標題會被藍色框起來，告訴你這一行對應畫面上的哪一塊。</p>
+<p>你也可以在 Elements 裡雙擊文字直接改，畫面會馬上變。但這只是暫時改了瀏覽器裡的那一份，<b>不會改到你的檔案</b>，重新整理就沒了。它適合用來「先試試看」，確定要改了，還是要回 VS Code 改檔案。</p>
+<h4>試試 Console</h4>
+<p>點 <b>Console</b>，在最下面有 <code>&gt;</code> 符號的那一行打：</p>
+<div class="code plain"><pre tabindex="0">1 + 1</pre></div>
+
+<p>按 Enter，下一行會出現 <code>2</code>。你剛剛執行了第一行 JavaScript。Console 會把你打的東西當成 JavaScript 執行，再把結果顯示出來。第 3 章會常常在這裡做實驗。</p>
+<div class="box trap"><span class="t">陷阱</span><p>如果你是<b>貼上</b>程式碼，而不是自己打字，Chrome 可能會跳出警告，要你先打 <code>allow pasting</code> 才能貼。這是 Chrome 的防詐騙設計：壞人常叫別人把一段程式碼貼進 Console 來偷資料。來源不明的程式碼，不要貼進 Console。</p></div>
+<div class="box key"><span class="t">重點</span><p>程式跑不出預期的結果時，第一件事就是打開開發者工具看 Console 有沒有紅字。紅字就是錯誤訊息，會告訴你錯在哪一行。</p></div>
+<div class="secq" data-ch="0" data-isec="s0-5"></div>
+<h3 id="s0-6">0.6 本章整理</h3>
+<ul class="pts">
+<li>網頁由三種文字組成：<b>HTML</b> 管有什麼、<b>CSS</b> 管長什麼樣、<b>JavaScript</b> 管會做什麼。Vue 是用 JavaScript 寫成的工具，第 8 章才用到。</li>
+<li>寫網頁要兩個軟體：<b>瀏覽器</b>（Chrome 或 Edge）和 <b>VS Code</b>。不要用文字編輯（TextEdit）或 Word。</li>
+<li>網頁檔的副檔名是 <b><code>.html</code></b>。Windows 預設會藏副檔名，小心存成 <code>.html.txt</code>。</li>
+<li>在 VS Code 的 <code>.html</code> 檔裡打 <code>!</code> 再按 Enter，會自動產生網頁樣板。要顯示的內容寫在 <code>&lt;body&gt;</code> 裡。</li>
+<li>改程式的循環：<b>改 → 存 → 重新整理</b>。少一步畫面就不會變。檔名旁有白色圓點，代表還沒存檔。</li>
+<li>開發者工具：Mac 按 <b>Cmd＋Option＋I</b>，Windows 按 <b>F12</b>，或在網頁上按右鍵選「檢查」。<b>Elements</b> 看結構，<b>Console</b> 看錯誤。</li>
+<li>在 Elements 裡改的東西只是暫時的，不會存回檔案。</li>
+</ul>
+</article>
+<article class="chapter" id="text1" hidden><p class="lead">這一章學 HTML，也就是網頁的骨架。念完你會：看懂一個標籤由哪幾個部分組成、知道一份網頁檔的基本架構每一行在做什麼、會放標題、段落、連結、圖片、清單、表格和輸入框，最後學會用 <code>div</code>、<code>class</code>、<code>id</code> 把網頁分區。這些都是之後寫 Vue 畫面的基本材料。</p>
+
+<h3 id="s1-1">1.1 標籤：HTML 的基本單位</h3>
+<p>HTML 用<b>標籤</b>（tag）告訴瀏覽器「這段文字是什麼東西」。例如這是一個大標題、那是一段文字。看一個最簡單的例子：</p>
+<div class="code html"><div class="bar"><span class="lab">HTML</span><button data-edit>改改看</button><button data-undo hidden>還原</button></div><pre tabindex="0">&lt;h1&gt;今天的記帳&lt;/h1&gt;
+&lt;p&gt;早餐花了 60 元。&lt;/p&gt;</pre><div class="preview"><div class="lab">畫面</div><iframe title="HTML 的畫面" sandbox="allow-scripts allow-same-origin allow-popups" loading="lazy"></iframe></div></div>
+
+<p>拆開第一行看，它由三個部分組成：</p>
+<div class="tbl"><table>
+<tr><th>部分</th><th>寫法</th><th>意思</th></tr>
+<tr><td>開始標籤</td><td><code>&lt;h1&gt;</code></td><td>告訴瀏覽器：「大標題從這裡開始」</td></tr>
+<tr><td>內容</td><td><code>今天的記帳</code></td><td>要顯示的文字</td></tr>
+<tr><td>結束標籤</td><td><code>&lt;/h1&gt;</code></td><td>告訴瀏覽器：「大標題到這裡結束」。和開始標籤一樣，只是多了一條斜線 <code>/</code></td></tr>
+</table></div>
+<p>開始標籤、內容、結束標籤合起來，叫做一個<b>元素</b>（element）。所以上面的例子有兩個元素：一個 <code>h1</code> 元素、一個 <code>p</code> 元素。</p>
+<div class="box key"><span class="t">重點</span><p>標籤是用尖括號 <code>&lt;</code> <code>&gt;</code> 包起來的名稱。結束標籤在名稱前面多一條斜線 <code>/</code>。標籤本身不會顯示在畫面上，顯示的只有內容。</p></div>
+<h4>標題與段落</h4>
+<p><code>h</code> 是 heading（標題）的縮寫。HTML 有 <code>h1</code> 到 <code>h6</code> 六級標題，<code>h1</code> 最大、最重要，<code>h6</code> 最小。<code>p</code> 是 paragraph（段落）的縮寫，用來放一般的文字。</p>
+<div class="code html"><div class="bar"><span class="lab">六級標題和段落</span><button data-edit>改改看</button><button data-undo hidden>還原</button></div><pre tabindex="0">&lt;h1&gt;h1 大標題&lt;/h1&gt;
+&lt;h2&gt;h2 第二級&lt;/h2&gt;
+&lt;h3&gt;h3 第三級&lt;/h3&gt;
+&lt;h6&gt;h6 最小的標題&lt;/h6&gt;
+&lt;p&gt;這是一個段落。&lt;/p&gt;
+&lt;p&gt;這是另一個段落，兩個段落之間會自動空一點距離。&lt;/p&gt;</pre><div class="preview"><div class="lab">畫面</div><iframe title="六級標題和段落 的畫面" sandbox="allow-scripts allow-same-origin allow-popups" loading="lazy"></iframe></div></div>
+
+<p>標題要照順序用：大標題用 <code>h1</code>，底下的小節用 <code>h2</code>，再下一層用 <code>h3</code>。不要因為「想要字小一點」就跳去用 <code>h4</code>。字的大小是外觀，第 2 章會用 CSS 調整。HTML 只負責說「這是第幾級標題」。</p>
+<div class="box trap"><span class="t">陷阱</span><p>結束標籤的斜線很容易漏打。寫成 <code>&lt;h1&gt;標題&lt;h1&gt;</code> 的話，瀏覽器會以為第二個 <code>&lt;h1&gt;</code> 是另一個標題的開始，後面的文字全部被當成大標題。畫面突然出現一大片粗大的字，先檢查結束標籤有沒有斜線。</p></div>
+<div class="secq" data-ch="1" data-isec="s1-1"></div>
+<h3 id="s1-2">1.2 一份網頁檔的基本架構</h3>
+<p>第 0 章在 VS Code 打 <code>!</code> 產生的樣板，每一行都有作用。現在一行一行看：</p>
+<div class="code plain"><div class=lab>HTML</div><pre tabindex="0">&lt;!DOCTYPE html&gt;
+&lt;html lang="zh-Hant"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;我的記帳本&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;h1&gt;今天的記帳&lt;/h1&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre></div>
+
+<div class="tbl"><table>
+<tr><th>這一行</th><th>做什麼</th></tr>
+<tr><td><code>&lt;!DOCTYPE html&gt;</code></td><td>告訴瀏覽器：「這是一份用現代 HTML 寫的網頁」。永遠放在第一行，照抄就好</td></tr>
+<tr><td><code>&lt;html lang="zh-Hant"&gt;</code></td><td>整份網頁的最外層。<code>lang</code> 說明網頁用什麼語言，<code>zh-Hant</code> 是繁體中文。樣板預設的 <code>en</code> 是英文，改成中文比較正確</td></tr>
+<tr><td><code>&lt;head&gt;</code> … <code>&lt;/head&gt;</code></td><td>網頁的「頭」：放給瀏覽器看的設定，<b>不會顯示在頁面內容裡</b></td></tr>
+<tr><td><code>&lt;meta charset="UTF-8"&gt;</code></td><td>告訴瀏覽器這份檔案用 UTF-8 編碼。少了它，中文可能變成亂碼</td></tr>
+<tr><td><code>&lt;meta name="viewport" …&gt;</code></td><td>讓網頁在手機上用正確的寬度顯示。少了它，手機會把網頁縮得很小</td></tr>
+<tr><td><code>&lt;title&gt;</code> … <code>&lt;/title&gt;</code></td><td>網頁的名稱，顯示在瀏覽器<b>分頁標籤</b>上，不是顯示在頁面裡</td></tr>
+<tr><td><code>&lt;body&gt;</code> … <code>&lt;/body&gt;</code></td><td>網頁的「身體」：所有要顯示給人看的內容都寫在這裡</td></tr>
+</table></div>
+<p><code>&lt;!DOCTYPE html&gt;</code> 和 <code>&lt;meta charset&gt;</code>、<code>&lt;meta name="viewport"&gt;</code> 這種寫一次就不用管的設定，每份網頁都長得一樣，用 VS Code 的 <code>!</code> 產生就好，不用背。真正要每天寫的只有 <code>&lt;body&gt;</code> 裡面。</p>
+<div class="box trap"><span class="t">陷阱</span><p><code>&lt;title&gt;</code> 不是頁面上的大標題。它只出現在瀏覽器分頁標籤上，還有加入書籤時的名稱。頁面上的大標題要用 <code>&lt;h1&gt;</code>。</p></div>
+<h4>為什麼要 meta charset</h4>
+<p>電腦存文字時，要把每個字轉成數字存起來，轉換的規則叫<b>編碼</b>。VS Code 預設用 <b>UTF-8</b> 這套規則存檔。瀏覽器讀檔時，如果沒有人告訴它檔案是用哪套規則存的，它只能用猜的，猜錯就會把中文顯示成「ä»Šå¤©」這種亂碼。<code>&lt;meta charset="UTF-8"&gt;</code> 就是直接告訴瀏覽器答案，不讓它猜。</p>
+<div class="box key"><span class="t">重點</span><p>書裡的 HTML 範例為了簡短，只寫 <code>&lt;body&gt;</code> 裡面的內容。你自己存成檔案時，一定要放進完整的樣板裡。</p></div>
+<div class="secq" data-ch="1" data-isec="s1-2"></div>
+<h3 id="s1-3">1.3 元素裡面放元素，以及空白和換行</h3>
+<h4>巢狀</h4>
+<p>元素裡面可以再放元素，叫做<b>巢狀</b>（nesting）。例如在段落裡，想把某幾個字變粗體強調，可以用 <code>&lt;strong&gt;</code>：</p>
+<div class="code html"><div class="bar"><span class="lab">HTML</span><button data-edit>改改看</button><button data-undo hidden>還原</button></div><pre tabindex="0">&lt;p&gt;早餐花了 &lt;strong&gt;60 元&lt;/strong&gt;，有點貴。&lt;/p&gt;</pre><div class="preview"><div class="lab">畫面</div><iframe title="HTML 的畫面" sandbox="allow-scripts allow-same-origin allow-popups" loading="lazy"></iframe></div></div>
+
+<p><code>strong</code> 元素整個被包在 <code>p</code> 元素裡面。這時我們說 <code>p</code> 是 <code>strong</code> 的<b>父元素</b>（parent），<code>strong</code> 是 <code>p</code> 的<b>子元素</b>（child）。前面的 <code>&lt;html&gt;</code> 包著 <code>&lt;head&gt;</code> 和 <code>&lt;body&gt;</code>，也是同樣的關係。</p>
+<p>巢狀有一個規則：<b>先開的後關</b>。像收納盒一樣，小盒子要整個放進大盒子裡，不能一半在裡面一半在外面。</p>
+<div class="tbl"><table>
+<tr><th>寫法</th><th>對不對</th><th>原因</th></tr>
+<tr><td><code>&lt;p&gt;花了 &lt;strong&gt;60 元&lt;/strong&gt;&lt;/p&gt;</code></td><td>對</td><td><code>strong</code> 先關，<code>p</code> 後關，<code>strong</code> 整個在 <code>p</code> 裡面</td></tr>
+<tr><td><code>&lt;p&gt;花了 &lt;strong&gt;60 元&lt;/p&gt;&lt;/strong&gt;</code></td><td>錯</td><td><code>p</code> 先關了，<code>strong</code> 卻還沒關，兩個盒子交叉了</td></tr>
+</table></div>
+<p>寫錯的話，瀏覽器不會跳出錯誤訊息，而是自己猜你想怎樣、自動修正，畫出來的結果常常跟你想的不一樣。HTML 寫錯不會報錯，所以畫面怪怪的時候，要打開開發者工具的 Elements，看瀏覽器實際修成什麼樣子。</p>
+<h4>縮排</h4>
+<p>裡層的元素通常會往右縮排，讓人一眼看出誰包著誰。<b>縮排只是給人看的</b>，瀏覽器不在乎。下面兩種寫法，畫出來完全一樣：</p>
+<div class="code plain"><div class=lab>HTML</div><pre tabindex="0">&lt;body&gt;&lt;h1&gt;記帳&lt;/h1&gt;&lt;p&gt;早餐 60 元&lt;/p&gt;&lt;/body&gt;
+
+&lt;body&gt;
+    &lt;h1&gt;記帳&lt;/h1&gt;
+    &lt;p&gt;早餐 60 元&lt;/p&gt;
+&lt;/body&gt;</pre></div>
+
+<p>第二種好讀很多，所以大家都這樣寫。VS Code 裡選取幾行後按 Tab 會往右縮，按 Shift＋Tab 往左縮。</p>
+<h4>空白和換行會被合併</h4>
+<p>這是初學者最常嚇一跳的地方：你在程式碼裡按的 Enter 和連續空白，瀏覽器都<b>不會照樣顯示</b>。連續的空白、換行，全部被當成一個空白。</p>
+<div class="code html"><div class="bar"><span class="lab">在程式碼裡換行和空很多格</span><button data-edit>改改看</button><button data-undo hidden>還原</button></div><pre tabindex="0">&lt;p&gt;早餐 60 元
+午餐 120 元
+晚餐     200 元&lt;/p&gt;</pre><div class="preview"><div class="lab">畫面</div><iframe title="在程式碼裡換行和空很多格 的畫面" sandbox="allow-scripts allow-same-origin allow-popups" loading="lazy"></iframe></div></div>
+
+<p>三行字被接成一行，「晚餐」後面的五個空白也只剩一個。想要換行有兩種做法：</p>
+<ul class="pts">
+<li><b>分成不同段落</b>：每一筆寫成一個 <code>&lt;p&gt;</code>。這是比較好的做法，因為它們本來就是不同的東西。</li>
+<li><b>用 <code>&lt;br&gt;</code> 強制換行</b>：<code>br</code> 是 break（斷開）的縮寫。它只是在原地換行，適合地址、詩句這種「同一段文字但要分行」的情況。</li>
+</ul>
+<div class="code html"><div class="bar"><span class="lab">用 br 換行</span><button data-edit>改改看</button><button data-undo hidden>還原</button></div><pre tabindex="0">&lt;p&gt;早餐 60 元&lt;br&gt;午餐 120 元&lt;br&gt;晚餐 200 元&lt;/p&gt;</pre><div class="preview"><div class="lab">畫面</div><iframe title="用 br 換行 的畫面" sandbox="allow-scripts allow-same-origin allow-popups" loading="lazy"></iframe></div></div>
+
+<p>注意 <code>&lt;br&gt;</code> 沒有結束標籤，因為它裡面不會放任何內容。這種元素叫<b>空元素</b>（void element），下一節的 <code>&lt;img&gt;</code> 也是。</p>
+<div class="box key"><span class="t">重點</span><p>程式碼裡的換行和連續空白，在畫面上只算一個空白。要分段用 <code>&lt;p&gt;</code>，要在同一段裡換行用 <code>&lt;br&gt;</code>。</p></div>
+<div class="secq" data-ch="1" data-isec="s1-3"></div>
+<h3 id="s1-4">1.4 屬性：連結和圖片</h3>
+<p>有些元素光有名稱還不夠，需要更多資訊。例如連結要知道「連到哪裡」，圖片要知道「圖在哪裡」。這些額外資訊寫在開始標籤裡，叫做<b>屬性</b>（attribute）。</p>
+<h4>連結 a</h4>
+<div class="code html"><div class="bar"><span class="lab">HTML</span><button data-edit>改改看</button><button data-undo hidden>還原</button></div><pre tabindex="0">&lt;p&gt;看更多：&lt;a href="https://vuejs.org/"&gt;Vue 官方網站&lt;/a&gt;&lt;/p&gt;</pre><div class="preview"><div class="lab">畫面</div><iframe title="HTML 的畫面" sandbox="allow-scripts allow-same-origin allow-popups" loading="lazy"></iframe></div></div>
+
+<p>把 <code>&lt;a href="https://vuejs.org/"&gt;</code> 拆開：</p>
+<div class="tbl"><table>
+<tr><th>部分</th><th>寫法</th><th>意思</th></tr>
+<tr><td>標籤名稱</td><td><code>a</code></td><td>anchor（錨）的縮寫，就是連結</td></tr>
+<tr><td>屬性名稱</td><td><code>href</code></td><td>hypertext reference 的縮寫，意思是「連到哪裡」</td></tr>
+<tr><td>等號</td><td><code>=</code></td><td>連接屬性名稱和值，前後不要加空白</td></tr>
+<tr><td>屬性值</td><td><code>"https://vuejs.org/"</code></td><td>要連去的網址，用雙引號包起來</td></tr>
+</table></div>
+<p><code>&lt;a&gt;</code> 和 <code>&lt;/a&gt;</code> 中間的「Vue 官方網站」是畫面上可以點的文字。畫面上不會顯示網址，只顯示這段文字。</p>
+<p>想讓連結在<b>新分頁</b>打開，再多加一個屬性 <code>target="_blank"</code>。一個標籤可以有很多個屬性，彼此用空白隔開，順序不重要：</p>
+<div class="code plain"><div class=lab>HTML</div><pre tabindex="0">&lt;a href="https://vuejs.org/" target="_blank"&gt;Vue 官方網站&lt;/a&gt;</pre></div>
+
+<h4>圖片 img</h4>
+<p><code>img</code> 是 image（圖片）的縮寫。它也是空元素，沒有結束標籤：</p>
+<div class="code html"><div class="bar"><span class="lab">HTML</span><button data-edit>改改看</button><button data-undo hidden>還原</button></div><pre tabindex="0">&lt;img src="img/note.svg" alt="記帳本圖示" width="80"&gt;
+&lt;p&gt;上面是一個記帳本圖示。&lt;/p&gt;</pre><div class="preview"><div class="lab">畫面</div><iframe title="HTML 的畫面" sandbox="allow-scripts allow-same-origin allow-popups" loading="lazy"></iframe></div></div>
+
+<div class="tbl"><table>
+<tr><th>屬性</th><th>意思</th></tr>
+<tr><td><code>src</code></td><td>source（來源）的縮寫：圖片的位置</td></tr>
+<tr><td><code>alt</code></td><td>alternative（替代）的縮寫：圖片無法顯示時改顯示的文字。看不到畫面的人用的「報讀軟體」也會念出這段文字</td></tr>
+<tr><td><code>width</code></td><td>寬度，單位是像素（px）。只寫寬度時，高度會照比例自動算</td></tr>
+</table></div>
+<p><code>src="img/note.svg"</code> 的意思是「到 <code>img</code> 資料夾裡找 <code>note.svg</code> 這個檔」，這種寫法叫相對網址，下一小段會講。按「改改看」，把 <code>src</code> 隨便改錯一個字，就能看到圖片顯示不出來時，<code>alt</code> 的文字跑出來的樣子。</p>
+<div class="box key"><span class="t">重點</span><p>每張 <code>&lt;img&gt;</code> 都要寫 <code>alt</code>。圖片載入失敗時它會顯示出來，報讀軟體也靠它告訴看不到畫面的人這是什麼圖。</p></div>
+<h4>網址的兩種寫法</h4>
+<p><code>href</code> 和 <code>src</code> 的值可以寫兩種網址：</p>
+<div class="tbl"><table>
+<tr><th>種類</th><th>例子</th><th>意思</th></tr>
+<tr><td><b>絕對網址</b></td><td><code>https://vuejs.org/logo.svg</code></td><td>從 <code>https://</code> 開始寫的完整網址，指向網路上的某個位置</td></tr>
+<tr><td><b>相對網址</b></td><td><code>cat.jpg</code>、<code>images/cat.jpg</code></td><td>從<b>目前這個 HTML 檔所在的資料夾</b>開始找</td></tr>
+</table></div>
+<p>假設資料夾長這樣：</p>
+<div class="code plain"><pre tabindex="0">vue-book/
+├── index.html
+├── cat.jpg
+├── about.html
+└── images/
+    └── dog.jpg</pre></div>
+
+<p>在 <code>index.html</code> 裡：</p>
+<ul class="pts">
+<li><code>&lt;img src="cat.jpg"&gt;</code>：找同一層的 <code>cat.jpg</code>。</li>
+<li><code>&lt;img src="images/dog.jpg"&gt;</code>：先進 <code>images</code> 資料夾，再找 <code>dog.jpg</code>。斜線 <code>/</code> 代表「進到裡面」。</li>
+<li><code>&lt;a href="about.html"&gt;關於&lt;/a&gt;</code>：點了會打開同一層的 <code>about.html</code>。用這種方法，就能做出好幾頁互相連結的網站。</li>
+</ul>
+<div class="box trap"><span class="t">陷阱</span><p>相對網址的大小寫要一致。檔案叫 <code>Cat.jpg</code>，程式寫 <code>cat.jpg</code>，在 Mac 和 Windows 上通常找得到，但網頁放到網路主機上之後，大多數主機會分大小寫，圖片就破了。檔名一律用小寫最保險。</p></div>
+<div class="secq" data-ch="1" data-isec="s1-4"></div>
+<h3 id="s1-5">1.5 清單和表格</h3>
+<h4>清單</h4>
+<p>一筆一筆的東西用清單。HTML 有兩種清單：</p>
+<div class="code html"><div class="bar"><span class="lab">HTML</span><button data-edit>改改看</button><button data-undo hidden>還原</button></div><pre tabindex="0">&lt;h3&gt;今天要買&lt;/h3&gt;
+&lt;ul&gt;
+    &lt;li&gt;牛奶&lt;/li&gt;
+    &lt;li&gt;雞蛋&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3&gt;煮麵步驟&lt;/h3&gt;
+&lt;ol&gt;
+    &lt;li&gt;燒開水&lt;/li&gt;
+    &lt;li&gt;放麵&lt;/li&gt;
+    &lt;li&gt;煮三分鐘&lt;/li&gt;
+&lt;/ol&gt;</pre><div class="preview"><div class="lab">畫面</div><iframe title="HTML 的畫面" sandbox="allow-scripts allow-same-origin allow-popups" loading="lazy"></iframe></div></div>
+
+<div class="tbl"><table>
+<tr><th>標籤</th><th>全名</th><th>意思</th></tr>
+<tr><td><code>ul</code></td><td>unordered list</td><td>沒有順序的清單，每項前面是圓點</td></tr>
+<tr><td><code>ol</code></td><td>ordered list</td><td>有順序的清單，每項前面自動編號 1、2、3</td></tr>
+<tr><td><code>li</code></td><td>list item</td><td>清單裡的一項。不管是 <code>ul</code> 還是 <code>ol</code>，每一項都用 <code>li</code></td></tr>
+</table></div>
+<p><code>ol</code> 的編號是瀏覽器自動加的，你不用自己打 1、2、3。中間插入一項，後面的號碼會自動往後推。</p>
+<div class="box trap"><span class="t">陷阱</span><p><code>li</code> 一定要放在 <code>ul</code> 或 <code>ol</code> 裡面，<code>ul</code> 和 <code>ol</code> 的直接子元素也只能是 <code>li</code>。不要把文字直接寫在 <code>&lt;ul&gt;</code> 裡、<code>&lt;li&gt;</code> 外。</p></div>
+<p>第 11 章會學到 Vue 的 <code>v-for</code>，它最常見的用法就是「資料有幾筆，就自動產生幾個 <code>&lt;li&gt;</code>」。所以清單的結構要先記熟。</p>
+<h4>表格</h4>
+<p>記帳這種「每筆有好幾個欄位」的資料，適合用表格：</p>
+<div class="code html"><div class="bar"><span class="lab">HTML</span><button data-edit>改改看</button><button data-undo hidden>還原</button></div><pre tabindex="0">&lt;table border="1"&gt;
+    &lt;tr&gt;
+        &lt;th&gt;日期&lt;/th&gt;
+        &lt;th&gt;項目&lt;/th&gt;
+        &lt;th&gt;金額&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;11/24&lt;/td&gt;
+        &lt;td&gt;早餐&lt;/td&gt;
+        &lt;td&gt;60&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;11/24&lt;/td&gt;
+        &lt;td&gt;午餐&lt;/td&gt;
+        &lt;td&gt;120&lt;/td&gt;
+    &lt;/tr&gt;
+&lt;/table&gt;</pre><div class="preview"><div class="lab">畫面</div><iframe title="HTML 的畫面" sandbox="allow-scripts allow-same-origin allow-popups" loading="lazy"></iframe></div></div>
+
+<div class="tbl"><table>
+<tr><th>標籤</th><th>全名</th><th>意思</th></tr>
+<tr><td><code>table</code></td><td>table</td><td>整個表格</td></tr>
+<tr><td><code>tr</code></td><td>table row</td><td>表格的<b>一列</b>（橫的一整排）</td></tr>
+<tr><td><code>th</code></td><td>table header</td><td>標題格，瀏覽器預設會粗體、置中</td></tr>
+<tr><td><code>td</code></td><td>table data</td><td>一般的資料格</td></tr>
+</table></div>
+<p>HTML 的表格是<b>一列一列寫</b>的：先開一個 <code>tr</code>，在裡面依序放這一列的每一格。沒有「直的一欄」這種標籤，欄是由每一列的第幾格自然對齊出來的。所以每一列的格數要一樣，不然會對不齊。</p>
+<p><code>border="1"</code> 是讓表格顯示格線的舊寫法，這裡只是為了讓你看清楚每一格。正式的做法是用 CSS 畫格線，第 2 章會教。</p>
+<div class="secq" data-ch="1" data-isec="s1-5"></div>
+<h3 id="s1-6">1.6 讓使用者輸入：表單元素</h3>
+<p>到目前為止的元素都只能看。要讓使用者輸入資料，例如記帳時填項目和金額，要用<b>表單元素</b>：</p>
+<div class="code html"><div class="bar"><span class="lab">記一筆帳</span><button data-edit>改改看</button><button data-undo hidden>還原</button></div><pre tabindex="0">&lt;p&gt;
+    &lt;label for="item"&gt;項目&lt;/label&gt;
+    &lt;input id="item" type="text" placeholder="例如：早餐"&gt;
+&lt;/p&gt;
+&lt;p&gt;
+    &lt;label for="amount"&gt;金額&lt;/label&gt;
+    &lt;input id="amount" type="number" value="60"&gt;
+&lt;/p&gt;
+&lt;p&gt;
+    &lt;label for="kind"&gt;分類&lt;/label&gt;
+    &lt;select id="kind"&gt;
+        &lt;option&gt;餐飲&lt;/option&gt;
+        &lt;option&gt;交通&lt;/option&gt;
+        &lt;option&gt;其他&lt;/option&gt;
+    &lt;/select&gt;
+&lt;/p&gt;
+&lt;p&gt;
+    &lt;input id="paid" type="checkbox" checked&gt;
+    &lt;label for="paid"&gt;已付款&lt;/label&gt;
+&lt;/p&gt;
+&lt;button&gt;新增&lt;/button&gt;</pre><div class="preview"><div class="lab">畫面</div><iframe title="記一筆帳 的畫面" sandbox="allow-scripts allow-same-origin allow-popups" loading="lazy"></iframe></div></div>
+
+<p>在上面的畫面裡打打看、點點看，這些輸入框都能用了。只是按「新增」還不會發生任何事，因為「按下去要做什麼」是 JavaScript 的工作（第 7 章）。</p>
+<div class="tbl"><table>
+<tr><th>元素</th><th>做什麼</th><th>重點</th></tr>
+<tr><td><code>&lt;input type="text"&gt;</code></td><td>單行文字輸入框</td><td><code>placeholder</code> 是框裡淡淡的提示字，一打字就消失，不算是值</td></tr>
+<tr><td><code>&lt;input type="number"&gt;</code></td><td>只能輸入數字的框</td><td>旁邊會出現上下箭頭。<code>value</code> 是一開始就填好的值</td></tr>
+<tr><td><code>&lt;input type="checkbox"&gt;</code></td><td>勾選框</td><td>加上 <code>checked</code> 代表一開始就打勾</td></tr>
+<tr><td><code>&lt;select&gt;</code> ＋ <code>&lt;option&gt;</code></td><td>下拉選單</td><td>每個 <code>option</code> 是一個選項，預設選第一個</td></tr>
+<tr><td><code>&lt;button&gt;</code></td><td>按鈕</td><td>有結束標籤，中間的文字就是按鈕上的字</td></tr>
+<tr><td><code>&lt;label&gt;</code></td><td>輸入框的說明文字</td><td>見下面說明</td></tr>
+</table></div>
+<p><code>input</code> 是空元素，沒有結束標籤。同一個 <code>input</code>，只要換 <code>type</code> 屬性的值，就會變成不同種類的輸入框。</p>
+<h4>label 和 for</h4>
+<p><code>&lt;label for="paid"&gt;</code> 的 <code>for</code> 要寫成某個輸入框的 <code>id</code>（<code>id</code> 是元素的名字，1.7 節會細講）。這樣這段文字就和那個輸入框綁在一起了：點文字「已付款」，勾選框也會跟著勾或取消。在上面的畫面點點看。</p>
+<p>這對使用者很方便，因為勾選框很小不好點，文字比較好點；報讀軟體也會知道這段文字在說明哪個框。</p>
+<div class="box trap"><span class="t">陷阱</span><p><code>checked</code> 這種屬性只寫名稱、不寫值，叫<b>布林屬性</b>：有寫就是「是」，沒寫就是「否」。所以寫 <code>checked="false"</code> 仍然會打勾，因為瀏覽器只看「有沒有這個屬性」，不看值。要不打勾，就整個不要寫 <code>checked</code>。</p></div>
+<div class="box key"><span class="t">重點</span><p>第 12 章 Vue 的 <code>v-model</code>，就是把這些輸入框和資料綁在一起：使用者一打字，資料就跟著變。</p></div>
+<p>你可能會在別的地方看到輸入框外面包著 <code>&lt;form&gt;</code>。<code>form</code> 會在按下按鈕時把資料送到伺服器、整頁重新載入，那是比較傳統的做法。本書用 Vue 自己處理資料，第 16 章才會講怎麼送資料給後端，所以目前先不用 <code>form</code>。</p>
+<div class="secq" data-ch="1" data-isec="s1-6"></div>
+<h3 id="s1-7">1.7 分區用的 div、span，以及 id 和 class</h3>
+<p>前面的元素都有特定意思：<code>h1</code> 是標題、<code>p</code> 是段落、<code>li</code> 是清單項目。但有時候你只是想把幾個東西「包成一組」，好讓 CSS 一起調整樣式，或讓 JavaScript 一起處理。這時用兩個本身沒有意思的元素：</p>
+<div class="tbl"><table>
+<tr><th>元素</th><th>全名</th><th>用途</th></tr>
+<tr><td><code>div</code></td><td>division（區塊）</td><td>包住<b>一大塊</b>內容，例如一張卡片、一個側邊欄。會獨佔一整行</td></tr>
+<tr><td><code>span</code></td><td>span（一小段）</td><td>包住<b>一行文字裡的一小段</b>，例如金額數字。不會換行</td></tr>
+</table></div>
+<div class="code html"><div class="bar"><span class="lab">HTML</span><button data-edit>改改看</button><button data-undo hidden>還原</button></div><pre tabindex="0">&lt;div&gt;
+    &lt;h3&gt;早餐&lt;/h3&gt;
+    &lt;p&gt;金額：&lt;span&gt;60&lt;/span&gt; 元&lt;/p&gt;
+&lt;/div&gt;
+&lt;div&gt;
+    &lt;h3&gt;午餐&lt;/h3&gt;
+    &lt;p&gt;金額：&lt;span&gt;120&lt;/span&gt; 元&lt;/p&gt;
+&lt;/div&gt;</pre><div class="preview"><div class="lab">畫面</div><iframe title="HTML 的畫面" sandbox="allow-scripts allow-same-origin allow-popups" loading="lazy"></iframe></div></div>
+
+<p>看畫面會發現，加了 <code>div</code> 和 <code>span</code> 跟沒加看起來一模一樣。它們本來就沒有樣式，只是一個「盒子」。等第 2 章學了 CSS，替它們加上邊框和底色，才會看出用處。<code>div</code> 為什麼會獨佔一行、<code>span</code> 為什麼不會，第 2 章 2.7 節會講。</p>
+<h4>class 和 id：替元素取名字</h4>
+<p>網頁上有很多 <code>div</code>，CSS 和 JavaScript 要怎麼指定「是哪一個」？方法是替元素加上 <code>class</code> 或 <code>id</code> 屬性：</p>
+<div class="code plain"><div class=lab>HTML</div><pre tabindex="0">&lt;div class="card"&gt;
+    &lt;h3&gt;早餐&lt;/h3&gt;
+    &lt;p&gt;金額：&lt;span class="money"&gt;60&lt;/span&gt; 元&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="card expensive"&gt;
+    &lt;h3&gt;晚餐&lt;/h3&gt;
+    &lt;p&gt;金額：&lt;span class="money"&gt;450&lt;/span&gt; 元&lt;/p&gt;
+&lt;/div&gt;
+&lt;p id="total"&gt;合計：510 元&lt;/p&gt;</pre></div>
+
+<div class="tbl"><table>
+<tr><th></th><th><code>id</code></th><th><code>class</code></th></tr>
+<tr><td>意思</td><td>這個元素<b>獨一無二</b>的名字，像身分證字號</td><td>這個元素屬於<b>哪一類</b>，像「學生」、「員工」這種身分</td></tr>
+<tr><td>同一頁可以重複嗎</td><td><b>不行</b>。同一個 <code>id</code> 一頁只能出現一次</td><td><b>可以</b>。很多元素可以有同一個 <code>class</code></td></tr>
+<tr><td>一個元素可以有幾個</td><td>一個</td><td>很多個，用空白隔開。例如 <code>class="card expensive"</code> 表示它同時屬於 <code>card</code> 和 <code>expensive</code> 兩類</td></tr>
+<tr><td>常見用途</td><td><code>label</code> 的 <code>for</code>、連結跳到頁面某處</td><td>套用 CSS 樣式（第 2 章最常用）</td></tr>
+</table></div>
+<p>名稱建議用英文小寫，有好幾個字就用 <code>-</code> 連起來，例如 <code>class="money-total"</code>。名稱裡<b>不能有空白</b>，因為 <code>class</code> 裡的空白是用來分隔「好幾個 class」的：<code>class="money total"</code> 是兩個 class，不是一個叫「money total」的 class。</p>
+<div class="box key"><span class="t">重點</span><p>要指定「這一個」用 <code>id</code>（全頁唯一），要指定「這一類」用 <code>class</code>（可以很多個）。寫 CSS 時大多用 <code>class</code>。</p></div>
+<div class="secq" data-ch="1" data-isec="s1-7"></div>
+<h3 id="s1-8">1.8 註解，以及用開發者工具看 HTML</h3>
+<h4>註解</h4>
+<p>寫在 <code>&lt;!--</code> 和 <code>--&gt;</code> 中間的文字叫<b>註解</b>（comment）。瀏覽器會完全忽略它，畫面上不會顯示。用來替自己或同事寫說明，或者暫時把一段程式碼「關掉」又不想刪掉：</p>
+<div class="code html"><div class="bar"><span class="lab">HTML</span><button data-edit>改改看</button><button data-undo hidden>還原</button></div><pre tabindex="0">&lt;!-- 這裡是記帳列表，下面每個 p 是一筆 --&gt;
+&lt;p&gt;早餐 60 元&lt;/p&gt;
+&lt;!-- &lt;p&gt;午餐 120 元&lt;/p&gt;  先關掉，之後再打開 --&gt;
+&lt;p&gt;晚餐 200 元&lt;/p&gt;</pre><div class="preview"><div class="lab">畫面</div><iframe title="HTML 的畫面" sandbox="allow-scripts allow-same-origin allow-popups" loading="lazy"></iframe></div></div>
+
+<p>畫面上只有早餐和晚餐，午餐那一行被註解包住，瀏覽器就不畫了。在 VS Code 裡選取幾行，按 <b>Cmd＋/</b>（Windows 是 <b>Ctrl＋/</b>）可以一次加上或拿掉註解。</p>
+<div class="box trap"><span class="t">陷阱</span><p>註解不會顯示在畫面上，但<b>任何人都看得到</b>。在網頁上按右鍵選「檢視網頁原始碼」，註解就在裡面。密碼、內部資訊絕對不要寫在 HTML 註解裡。</p></div>
+<h4>用 Elements 看結構</h4>
+<p>第 0 章打開過開發者工具的 Elements 分頁。現在你看得懂裡面的東西了：它顯示的就是網頁的元素，用縮排和三角形箭頭表示誰包著誰。點三角形可以展開或收起子元素。</p>
+<p>它有一個很實用的工具：左上角那個「箭頭指著方框」的圖示。按下它，再到網頁上點任何一個東西，Elements 就會直接跳到那個東西的 HTML。網頁很大、找不到某個東西在程式碼哪裡時，用它最快。</p>
+<p>另外要知道：Elements 顯示的是瀏覽器<b>實際理解的結構</b>，不一定跟你的檔案一模一樣。1.3 節說過，HTML 寫錯時瀏覽器會自動修正，Elements 顯示的就是修正後的結果。以後學了 JavaScript 和 Vue，程式會一直改網頁內容，Elements 顯示的也是改過之後的樣子。</p>
+<div class="box key"><span class="t">重點</span><p>畫面不如預期時，用 Elements 的箭頭工具點那個地方，看瀏覽器實際看到的結構。</p></div>
+<div class="secq" data-ch="1" data-isec="s1-8"></div>
+<h3 id="s1-9">1.9 本章整理</h3>
+<ul class="pts">
+<li>元素 ＝ 開始標籤 ＋ 內容 ＋ 結束標籤。結束標籤多一條斜線，例如 <code>&lt;p&gt;…&lt;/p&gt;</code>。</li>
+<li>網頁樣板：<code>&lt;head&gt;</code> 放設定（<code>meta charset</code> 防亂碼、<code>title</code> 是分頁標籤上的名稱），<code>&lt;body&gt;</code> 放要顯示的內容。</li>
+<li>標題 <code>h1</code>～<code>h6</code> 照層級用，段落用 <code>p</code>，強調用 <code>strong</code>。</li>
+<li>巢狀要「先開的後關」，不能交叉。HTML 寫錯不會報錯，瀏覽器會自己猜，要用 Elements 檢查。</li>
+<li>程式碼裡的換行和連續空白只算一個空白。分段用 <code>p</code>，同一段換行用 <code>br</code>。</li>
+<li>屬性寫在開始標籤裡：<code>名稱="值"</code>，多個屬性用空白隔開。連結 <code>&lt;a href&gt;</code>、圖片 <code>&lt;img src alt&gt;</code>。</li>
+<li>相對網址從目前 HTML 檔所在的資料夾開始找，檔名用小寫最保險。</li>
+<li>沒有內容的空元素沒有結束標籤：<code>br</code>、<code>img</code>、<code>input</code>。</li>
+<li>清單：<code>ul</code>（圓點）、<code>ol</code>（編號），每項都是 <code>li</code>。表格：<code>table</code> 裡一列一個 <code>tr</code>，格子用 <code>th</code>（標題）或 <code>td</code>（資料）。</li>
+<li>表單元素：<code>input</code> 換 <code>type</code> 就變不同的框（<code>text</code>、<code>number</code>、<code>checkbox</code>），下拉選單 <code>select</code>＋<code>option</code>，按鈕 <code>button</code>。<code>label</code> 的 <code>for</code> 對上輸入框的 <code>id</code>。</li>
+<li>布林屬性（如 <code>checked</code>）只看有沒有寫，不看值。</li>
+<li><code>div</code> 包一大塊、<code>span</code> 包一小段，本身沒有樣式。<code>id</code> 全頁唯一，<code>class</code> 可以重複、一個元素可以有好幾個。</li>
+<li>註解 <code>&lt;!-- --&gt;</code> 不會顯示，但任何人都看得到原始碼。</li>
+</ul>
+</article>
+<article class="chapter" id="text2" hidden><p class="lead">這一章學 CSS，負責網頁的外觀。念完你會：知道 CSS 寫在哪裡、看懂一條規則的每個部分、用選擇器指定要改哪些元素、知道兩條規則打架時誰會贏、會調顏色和文字，最後學會「盒子模型」和用 Flexbox 把東西排成一排。這些就足夠把第 18 章的記帳網頁排得整整齊齊。</p>
+
+<h3 id="s2-1">2.1 CSS 寫在哪裡</h3>
+<p>CSS 是 Cascading Style Sheets（層疊樣式表）的縮寫。它是另一種語言，專門描述「HTML 元素長什麼樣子」。CSS 有三種寫法：</p>
+<h4>寫法一：寫在 style 元素裡（本書範例最常用）</h4>
+<div class="code html"><div class="bar"><span class="lab">HTML</span><button data-edit>改改看</button><button data-undo hidden>還原</button></div><pre tabindex="0">&lt;style&gt;
+    h1 {
+        color: green;
+    }
+&lt;/style&gt;
+&lt;h1&gt;今天的記帳&lt;/h1&gt;
+&lt;p&gt;早餐 60 元&lt;/p&gt;</pre><div class="preview"><div class="lab">畫面</div><iframe title="HTML 的畫面" sandbox="allow-scripts allow-same-origin allow-popups" loading="lazy"></iframe></div></div>
+
+<p><code>&lt;style&gt;</code> 和 <code>&lt;/style&gt;</code> 中間寫的就是 CSS，不是 HTML。上面那條的意思是：「所有 <code>h1</code> 的文字顏色都改成綠色」。<code>p</code> 沒有被指定，所以還是黑色。</p>
+<p>在完整的網頁檔裡，<code>&lt;style&gt;</code> 要放在 <code>&lt;head&gt;</code> 裡面，因為它是「設定」，不是要顯示的內容。書裡的範例為了簡短，直接放在最前面，畫出來的效果一樣。</p>
+<h4>寫法二：寫在另一個 .css 檔，用 link 引進來</h4>
+<p>網站有很多頁時，把 CSS 統一寫在一個 <code>.css</code> 檔，每一頁用 <code>&lt;link&gt;</code> 引進來，改一個檔就能改全部頁面：</p>
+<div class="code plain"><div class=lab>HTML</div><pre tabindex="0"><span class="c">&lt;!-- index.html 的 head 裡 --&gt;</span>
+&lt;link rel="stylesheet" href="style.css"&gt;</pre></div>
+
+<div class="code plain"><div class=lab>CSS</div><pre tabindex="0"><span class="c">/* style.css：這個檔裡只寫 CSS，不用寫 &lt;style&gt; */</span>
+h1 {
+    color: green;
+}</pre></div>
+
+<p><code>rel="stylesheet"</code> 說明「這是樣式表」，<code>href</code> 是 <code>.css</code> 檔的位置，用的是第 1 章學過的相對網址。</p>
+<h4>寫法三：寫在元素的 style 屬性裡</h4>
+<div class="code plain"><div class=lab>HTML</div><pre tabindex="0">&lt;h1 style="color: green;"&gt;今天的記帳&lt;/h1&gt;</pre></div>
+
+<p>這樣只會影響這一個元素。寫起來快，但東西一多就很難管理，因為樣式散落在各個元素上，要改得一個一個找。只在臨時測試，或第 10 章 Vue 用資料動態改樣式時才會用到。</p>
+<div class="box key"><span class="t">重點</span><p>初學時把 CSS 寫在 <code>&lt;style&gt;</code> 裡最方便。網站變大以後改成獨立的 <code>.css</code> 檔。<code>style</code> 屬性盡量少用。</p></div>
+<div class="secq" data-ch="2" data-isec="s2-1"></div>
+<h3 id="s2-2">2.2 一條 CSS 規則的寫法</h3>
+<p>CSS 是由一條一條<b>規則</b>（rule）組成的。拆開下面這條看：</p>
+<div class="code plain"><div class=lab>CSS</div><pre tabindex="0">p {
+    color: red;
+    font-size: 20px;
+}</pre></div>
+
+<div class="tbl"><table>
+<tr><th>部分</th><th>寫法</th><th>意思</th></tr>
+<tr><td><b>選擇器</b>（selector）</td><td><code>p</code></td><td>要改<b>哪些元素</b>。這裡是所有的 <code>p</code></td></tr>
+<tr><td>大括號</td><td><code>{</code> … <code>}</code></td><td>包住這條規則的所有設定</td></tr>
+<tr><td><b>屬性</b>（property）</td><td><code>color</code>、<code>font-size</code></td><td>要改<b>什麼</b>：文字顏色、文字大小</td></tr>
+<tr><td>冒號</td><td><code>:</code></td><td>分隔屬性和值</td></tr>
+<tr><td><b>值</b>（value）</td><td><code>red</code>、<code>20px</code></td><td>要改<b>成什麼</b></td></tr>
+<tr><td>分號</td><td><code>;</code></td><td>一個設定結束。每個設定後面都要加</td></tr>
+</table></div>
+<p><code>屬性: 值;</code> 這一組叫一個<b>宣告</b>（declaration）。一條規則裡可以有很多個宣告，習慣上一行寫一個。</p>
+<p>注意 CSS 的「屬性」和 HTML 的「屬性」雖然中文一樣，是兩回事：HTML 的屬性寫在標籤裡（<code>href="…"</code>），CSS 的屬性寫在大括號裡（<code>color: red</code>）。</p>
+<h4>寫錯時會怎樣</h4>
+<p>CSS 跟 HTML 一樣，寫錯<b>不會</b>出現錯誤訊息。瀏覽器會<b>跳過看不懂的那個宣告</b>，其他的照常套用。最常見的錯有兩種：</p>
+<div class="code html"><div class="bar"><span class="lab">漏了分號</span><button data-edit>改改看</button><button data-undo hidden>還原</button></div><pre tabindex="0">&lt;style&gt;
+    p {
+        color: red
+        font-size: 30px;
+    }
+&lt;/style&gt;
+&lt;p&gt;早餐 60 元&lt;/p&gt;</pre><div class="preview"><div class="lab">畫面</div><iframe title="漏了分號 的畫面" sandbox="allow-scripts allow-same-origin allow-popups" loading="lazy"></iframe></div></div>
+
+<p><code>color: red</code> 後面少了分號，瀏覽器就讀成一個很長的值「<code>red font-size: 30px</code>」。這不是合法的顏色，於是整個宣告被丟掉，<b>連下一行的 <code>font-size</code> 也一起失效</b>。所以字還是黑色、大小也沒變。按「改改看」把分號補上，兩個設定都會生效。</p>
+<div class="code html"><div class="bar"><span class="lab">打成全形冒號</span><button data-edit>改改看</button><button data-undo hidden>還原</button></div><pre tabindex="0">&lt;style&gt;
+    p {
+        color：red;
+        font-size: 30px;
+    }
+&lt;/style&gt;
+&lt;p&gt;早餐 60 元&lt;/p&gt;</pre><div class="preview"><div class="lab">畫面</div><iframe title="打成全形冒號 的畫面" sandbox="allow-scripts allow-same-origin allow-popups" loading="lazy"></iframe></div></div>
+
+<p><code>color：red</code> 用的是中文輸入法打出來的全形冒號 <code>：</code>，瀏覽器不認得，這個宣告被跳過。但它後面有分號，所以下一行的 <code>font-size</code> 不受影響，字還是變大了。</p>
+<div class="box trap"><span class="t">陷阱</span><p>寫程式時要切換成<b>英文輸入法</b>。中文輸入法打出的全形 <code>：；｛｝＂</code>，看起來和半形的 <code>:;{}"</code> 很像，但電腦完全當成不同的字。在 VS Code 裡，看不懂的 CSS 底下通常會出現波浪線，可以幫你找到這種錯。</p></div>
+<div class="secq" data-ch="2" data-isec="s2-2"></div>
+<h3 id="s2-3">2.3 選擇器：指定要改哪些元素</h3>
+<p>選擇器決定「這條規則套用到誰身上」。最常用的有下面幾種：</p>
+<div class="tbl"><table>
+<tr><th>種類</th><th>寫法</th><th>選到誰</th></tr>
+<tr><td>標籤選擇器</td><td><code>p</code></td><td>所有 <code>p</code> 元素</td></tr>
+<tr><td>class 選擇器</td><td><code>.money</code></td><td>所有 <code>class</code> 裡有 <code>money</code> 的元素。前面加一個<b>點</b></td></tr>
+<tr><td>id 選擇器</td><td><code>#total</code></td><td><code>id</code> 是 <code>total</code> 的那一個元素。前面加一個<b>井字號</b></td></tr>
+<tr><td>後代選擇器</td><td><code>.card span</code></td><td>在 <code>.card</code> <b>裡面</b>的所有 <code>span</code>。兩個選擇器中間用空白隔開</td></tr>
+<tr><td>群組</td><td><code>h1, h2</code></td><td><code>h1</code> 和 <code>h2</code> 都套用。用逗號隔開</td></tr>
+</table></div>
+<div class="code html"><div class="bar"><span class="lab">各種選擇器</span><button data-edit>改改看</button><button data-undo hidden>還原</button></div><pre tabindex="0">&lt;style&gt;
+    .money {
+        color: red;
+    }
+    #total {
+        font-weight: bold;
+    }
+    .card span {
+        background-color: yellow;
+    }
+&lt;/style&gt;
+&lt;div class="card"&gt;
+    &lt;p&gt;早餐 &lt;span class="money"&gt;60&lt;/span&gt; 元&lt;/p&gt;
+    &lt;p&gt;午餐 &lt;span&gt;120&lt;/span&gt; 元&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;外面的 &lt;span&gt;span&lt;/span&gt; 不受 .card span 影響&lt;/p&gt;
+&lt;p id="total"&gt;合計 &lt;span class="money"&gt;180&lt;/span&gt; 元&lt;/p&gt;</pre><div class="preview"><div class="lab">畫面</div><iframe title="各種選擇器 的畫面" sandbox="allow-scripts allow-same-origin allow-popups" loading="lazy"></iframe></div></div>
+
+<p>對照畫面一條一條看：</p>
+<ul class="pts">
+<li><code>.money</code>：「60」和「180」都是紅字，因為它們都有 <code>class="money"</code>。一條規則同時套到兩個元素上，這就是 class 好用的地方。</li>
+<li><code>#total</code>：只有「合計」那一行變粗。</li>
+<li><code>.card span</code>：「60」和「120」有黃底，因為它們在 <code>class="card"</code> 的 <code>div</code> 裡面。第三行的 <code>span</code> 在 <code>.card</code> 外面，所以沒有黃底。「180」也在外面，所以只有紅字、沒有黃底。</li>
+</ul>
+<div class="box trap"><span class="t">陷阱</span><p>選擇器裡的<b>點</b>和<b>井字號</b>只在 CSS 裡寫，HTML 裡不寫。HTML 寫 <code>class="money"</code>，CSS 寫 <code>.money</code>。寫成 <code>class=".money"</code> 的話，CSS 的 <code>.money</code> 就選不到它。</p></div>
+<div class="box trap"><span class="t">陷阱</span><p>後代選擇器中間的空白很重要。<code>.card span</code> 是「<code>.card</code> 裡面的 <code>span</code>」；<code>.card, span</code> 多了一個逗號，意思就變成「<code>.card</code> 和所有 <code>span</code>」，差很多。</p></div>
+<div class="secq" data-ch="2" data-isec="s2-3"></div>
+<h3 id="s2-4">2.4 兩條規則打架時，誰會贏</h3>
+<p>同一個元素常常同時被好幾條規則選到。如果它們設定了同一個屬性，例如都設了 <code>color</code>，只會有一個生效。瀏覽器照下面的順序決定誰贏：</p>
+<h4>規則一：選擇器越「具體」越強</h4>
+<p>選擇器指得越精準，分量越重：</p>
+<ol class="flow">
+<li><b>標籤</b><span><code>p</code>：所有段落，最籠統</span></li>
+<li><b>class</b><span><code>.money</code>：某一類元素</span></li>
+<li><b>id</b><span><code>#total</code>：唯一的那一個，最具體</span></li>
+</ol>
+<div class="code html"><div class="bar"><span class="lab">HTML</span><button data-edit>改改看</button><button data-undo hidden>還原</button></div><pre tabindex="0">&lt;style&gt;
+    #total {
+        color: green;
+    }
+    .money {
+        color: red;
+    }
+    p {
+        color: blue;
+    }
+&lt;/style&gt;
+&lt;p&gt;一般段落&lt;/p&gt;
+&lt;p class="money"&gt;有 class 的段落&lt;/p&gt;
+&lt;p id="total" class="money"&gt;有 id 也有 class 的段落&lt;/p&gt;</pre><div class="preview"><div class="lab">畫面</div><iframe title="HTML 的畫面" sandbox="allow-scripts allow-same-origin allow-popups" loading="lazy"></iframe></div></div>
+
+<div class="tbl"><table>
+<tr><th>段落</th><th>被哪些規則選到</th><th>誰贏</th><th>結果</th></tr>
+<tr><td>第一段</td><td><code>p</code></td><td>只有一條</td><td>藍</td></tr>
+<tr><td>第二段</td><td><code>p</code>、<code>.money</code></td><td>class 比標籤具體</td><td>紅</td></tr>
+<tr><td>第三段</td><td><code>p</code>、<code>.money</code>、<code>#total</code></td><td>id 最具體</td><td>綠</td></tr>
+</table></div>
+<p>注意 <code>#total</code> 明明寫在最前面，還是贏了。<b>具體程度比寫的順序重要</b>。</p>
+<h4>規則二：一樣具體時，後寫的贏</h4>
+<div class="code html"><div class="bar"><span class="lab">HTML</span><button data-edit>改改看</button><button data-undo hidden>還原</button></div><pre tabindex="0">&lt;style&gt;
+    .money {
+        color: red;
+    }
+    .highlight {
+        color: orange;
+    }
+&lt;/style&gt;
+&lt;p class="money highlight"&gt;60 元&lt;/p&gt;</pre><div class="preview"><div class="lab">畫面</div><iframe title="HTML 的畫面" sandbox="allow-scripts allow-same-origin allow-popups" loading="lazy"></iframe></div></div>
+
+<p>兩條都是 class 選擇器，一樣具體，所以看誰寫在後面：<code>.highlight</code> 在後，字是橘色。注意，這裡看的是 <b>CSS 裡規則的順序</b>，跟 HTML 裡 <code>class="money highlight"</code> 兩個名字的順序無關。按「改改看」把 HTML 改成 <code>class="highlight money"</code>，顏色不會變；把 CSS 兩條規則上下對調，才會變成紅色。</p>
+<h4>規則三：style 屬性比所有選擇器都強</h4>
+<p>直接寫在元素上的 <code>style="…"</code>，會贏過 <code>&lt;style&gt;</code> 裡的任何選擇器，連 id 也贏不了它。這也是 2.1 節說盡量少用的原因之一：它太強了，之後想用 CSS 蓋過去很麻煩。</p>
+<h4>繼承：沒設定的，有些會跟爸爸一樣</h4>
+<p>有些屬性，父元素設了，子元素沒設的話，會自動跟著父元素，叫做<b>繼承</b>。文字相關的屬性大多會繼承，盒子相關的大多不會：</p>
+<div class="code html"><div class="bar"><span class="lab">HTML</span><button data-edit>改改看</button><button data-undo hidden>還原</button></div><pre tabindex="0">&lt;style&gt;
+    .card {
+        color: purple;
+        border: 2px solid gray;
+    }
+&lt;/style&gt;
+&lt;div class="card"&gt;
+    &lt;p&gt;早餐 &lt;strong&gt;60&lt;/strong&gt; 元&lt;/p&gt;
+&lt;/div&gt;</pre><div class="preview"><div class="lab">畫面</div><iframe title="HTML 的畫面" sandbox="allow-scripts allow-same-origin allow-popups" loading="lazy"></iframe></div></div>
+
+<p><code>div</code> 設了紫色字，裡面的 <code>p</code> 和 <code>strong</code> 都沒設顏色，所以都繼承成紫色。但 <code>border</code>（邊框，2.6 節會講）不會繼承，所以只有外面的 <code>div</code> 有框，<code>p</code> 自己沒有框。如果邊框會繼承，每一層都會多一個框，那就太亂了。</p>
+<div class="tbl"><table>
+<tr><th>會繼承（文字類）</th><th>不會繼承（盒子類）</th></tr>
+<tr><td><code>color</code>、<code>font-size</code>、<code>font-weight</code>、<code>text-align</code></td><td><code>border</code>、<code>padding</code>、<code>margin</code>、<code>width</code>、<code>background-color</code></td></tr>
+</table></div>
+<p><code>background-color</code> 不會繼承，但子元素的背景預設是透明的，所以看起來會「透出」父元素的底色。這不是繼承，是透明。</p>
+<div class="box key"><span class="t">重點</span><p>誰贏的判斷順序：<code>style</code> 屬性 ＞ id ＞ class ＞ 標籤；一樣具體時後寫的贏。自己完全沒被任何規則設定到的屬性，才會去看繼承。</p></div>
+<div class="secq" data-ch="2" data-isec="s2-4"></div>
+<h3 id="s2-5">2.5 顏色和文字</h3>
+<h4>顏色的寫法</h4>
+<div class="tbl"><table>
+<tr><th>寫法</th><th>例子</th><th>說明</th></tr>
+<tr><td>英文名稱</td><td><code>red</code>、<code>green</code>、<code>gray</code></td><td>最好懂，但只有固定的一百多種</td></tr>
+<tr><td>十六進位</td><td><code>#e53935</code></td><td><code>#</code> 後面六個字，每兩個一組，依序是紅、綠、藍的量（<code>00</code> 最少、<code>ff</code> 最多）。設計稿上的顏色大多用這種</td></tr>
+<tr><td>rgb</td><td><code>rgb(229, 57, 53)</code></td><td>紅、綠、藍各是 0～255。和上面的 <code>#e53935</code> 是同一個顏色</td></tr>
+</table></div>
+<p>顏色不用自己算。VS Code 在 CSS 的顏色值旁邊會顯示一個小色塊，點它就會跳出調色盤。</p>
+<h4>常用的文字和顏色屬性</h4>
+<div class="code html"><div class="bar"><span class="lab">HTML</span><button data-edit>改改看</button><button data-undo hidden>還原</button></div><pre tabindex="0">&lt;style&gt;
+    .title {
+        color: white;
+        background-color: #2e7d32;
+        font-size: 24px;
+        text-align: center;
+    }
+    .money {
+        font-weight: bold;
+        font-size: 150%;
+    }
+&lt;/style&gt;
+&lt;p class="title"&gt;本月支出&lt;/p&gt;
+&lt;p&gt;合計 &lt;span class="money"&gt;3,280&lt;/span&gt; 元&lt;/p&gt;</pre><div class="preview"><div class="lab">畫面</div><iframe title="HTML 的畫面" sandbox="allow-scripts allow-same-origin allow-popups" loading="lazy"></iframe></div></div>
+
+<div class="tbl"><table>
+<tr><th>屬性</th><th>管什麼</th><th>常用的值</th></tr>
+<tr><td><code>color</code></td><td>文字顏色</td><td>任何顏色</td></tr>
+<tr><td><code>background-color</code></td><td>背景顏色</td><td>任何顏色</td></tr>
+<tr><td><code>font-size</code></td><td>文字大小</td><td><code>16px</code>、<code>150%</code></td></tr>
+<tr><td><code>font-weight</code></td><td>文字粗細</td><td><code>normal</code>（一般）、<code>bold</code>（粗）</td></tr>
+<tr><td><code>text-align</code></td><td>文字在這一塊裡怎麼對齊</td><td><code>left</code>、<code>center</code>、<code>right</code></td></tr>
+</table></div>
+<h4>單位：px 和 %</h4>
+<p><code>px</code> 是 pixel（像素），螢幕上的一個小點，是最直接的單位。瀏覽器預設的文字大小是 <code>16px</code>。</p>
+<p><code>%</code> 是「相對於某個東西的百分之幾」。在 <code>font-size</code> 裡，是相對於<b>父元素的文字大小</b>。上面的「3,280」在 <code>p</code> 裡面，<code>p</code> 是預設的 16px，所以 <code>150%</code> 就是 16 × 1.5 ＝ <b>24px</b>。同樣是 <code>150%</code>，放在 20px 的父元素裡就會變成 30px。</p>
+<div class="box trap"><span class="t">陷阱</span><p>數字和單位之間<b>不能有空白</b>：<code>16px</code> 正確，<code>16 px</code> 會被當成看不懂的值而跳過。另外除了 <code>0</code> 以外，數字一定要帶單位：<code>font-size: 16</code> 沒有單位，也會被跳過。</p></div>
+<div class="secq" data-ch="2" data-isec="s2-5"></div>
+<h3 id="s2-6">2.6 盒子模型：每個元素都是一個盒子</h3>
+<p>在瀏覽器眼中，每個元素都是一個長方形的盒子。這個盒子由內到外有四層：</p>
+<div class="tbl"><table>
+<tr><th>層</th><th>屬性</th><th>比喻（裱框的畫）</th></tr>
+<tr><td>內容（content）</td><td><code>width</code>、<code>height</code></td><td>畫本身</td></tr>
+<tr><td>內距（padding）</td><td><code>padding</code></td><td>畫和框之間的白邊</td></tr>
+<tr><td>邊框（border）</td><td><code>border</code></td><td>畫框</td></tr>
+<tr><td>外距（margin）</td><td><code>margin</code></td><td>這幅畫和隔壁那幅畫之間的牆面空隙</td></tr>
+</table></div>
+<div class="code html"><div class="bar"><span class="lab">一張記帳卡片</span><button data-edit>改改看</button><button data-undo hidden>還原</button></div><pre tabindex="0">&lt;style&gt;
+    .card {
+        width: 200px;
+        padding: 16px;
+        border: 2px solid #2e7d32;
+        margin: 12px;
+        background-color: #e8f5e9;
+    }
+&lt;/style&gt;
+&lt;div class="card"&gt;早餐 60 元&lt;/div&gt;
+&lt;div class="card"&gt;午餐 120 元&lt;/div&gt;</pre><div class="preview"><div class="lab">畫面</div><iframe title="一張記帳卡片 的畫面" sandbox="allow-scripts allow-same-origin allow-popups" loading="lazy"></iframe></div></div>
+
+<p>看畫面：淺綠色的背景會塗滿<b>內容＋內距</b>，然後是綠色的框，框外面的空隙是外距，所以兩張卡片之間隔開了。</p>
+<h4>border 的寫法</h4>
+<p><code>border: 2px solid #2e7d32;</code> 一次寫了三件事，用空白隔開：</p>
+<div class="tbl"><table>
+<tr><th>部分</th><th>意思</th><th>其他常用的值</th></tr>
+<tr><td><code>2px</code></td><td>框的粗細</td><td><code>1px</code></td></tr>
+<tr><td><code>solid</code></td><td>框的樣式：實線</td><td><code>dashed</code>（虛線）、<code>dotted</code>（點線）</td></tr>
+<tr><td><code>#2e7d32</code></td><td>框的顏色</td><td>任何顏色</td></tr>
+</table></div>
+<p><code>solid</code> 這一項不能省略。只寫 <code>border: 2px #2e7d32;</code> 的話樣式預設是「沒有框」，什麼都看不到。</p>
+<h4>padding 和 margin 的寫法</h4>
+<p><code>padding: 16px;</code> 是上下左右四邊都 16px。也可以分開設：</p>
+<div class="tbl"><table>
+<tr><th>寫法</th><th>意思</th></tr>
+<tr><td><code>padding: 16px;</code></td><td>四邊都是 16px</td></tr>
+<tr><td><code>padding: 8px 16px;</code></td><td>上下 8px，左右 16px</td></tr>
+<tr><td><code>padding-top: 8px;</code></td><td>只設上面。另外還有 <code>-right</code>、<code>-bottom</code>、<code>-left</code></td></tr>
+</table></div>
+<p><code>margin</code> 的寫法完全一樣。另外，<code>margin: 0 auto;</code> 是一個常見的技巧：上下 0、左右「自動平分剩下的空間」，可以讓一個有設寬度的盒子在畫面上水平置中。</p>
+<h4>盒子到底多寬：box-sizing</h4>
+<p>上面的卡片設了 <code>width: 200px</code>，但它在畫面上其實是 <b>236px</b> 寬。因為預設情況下，<code>width</code> 只管<b>內容</b>那一層，內距和邊框要另外加上去：</p>
+<div class="code plain"><pre tabindex="0">左邊框 2 ＋ 左內距 16 ＋ 內容 200 ＋ 右內距 16 ＋ 右邊框 2 ＝ 236px</pre></div>
+
+<p>（外距不算在盒子的寬度裡，它是盒子外面的空隙。）</p>
+<p>這很不直覺：想要一張 200px 的卡片，還得自己扣掉內距和邊框。所以現在幾乎所有網站都會在 CSS 最前面加上這一條，讓 <code>width</code> 改成包含內距和邊框：</p>
+<div class="code html"><div class="bar"><span class="lab">加上 box-sizing: border-box</span><button data-edit>改改看</button><button data-undo hidden>還原</button></div><pre tabindex="0">&lt;style&gt;
+    * {
+        box-sizing: border-box;
+    }
+    .card {
+        width: 200px;
+        padding: 16px;
+        border: 2px solid #2e7d32;
+        background-color: #e8f5e9;
+    }
+&lt;/style&gt;
+&lt;div class="card"&gt;早餐 60 元&lt;/div&gt;</pre><div class="preview"><div class="lab">畫面</div><iframe title="加上 box-sizing: border-box 的畫面" sandbox="allow-scripts allow-same-origin allow-popups" loading="lazy"></iframe></div></div>
+
+<p><code>*</code> 是「所有元素」的選擇器。加了這條以後，卡片就是剛好 200px，內容區自動縮成 200 − 32 − 4 ＝ 164px。本書之後的範例，只要用到寬度，都會加上這條。</p>
+<div class="box key"><span class="t">重點</span><p>盒子由內到外：內容 → 內距 padding → 邊框 border → 外距 margin。預設的 <code>width</code> 只算內容；加上 <code>box-sizing: border-box</code> 後，<code>width</code> 會包含內距和邊框。</p></div>
+<h4>用 CSS 畫表格格線</h4>
+<p>第 1 章用 <code>border="1"</code> 畫表格線。用 CSS 的正式做法是替每一格加邊框，再把相鄰的框合併成一條線：</p>
+<div class="code html"><div class="bar"><span class="lab">HTML</span><button data-edit>改改看</button><button data-undo hidden>還原</button></div><pre tabindex="0">&lt;style&gt;
+    table {
+        border-collapse: collapse;
+    }
+    th, td {
+        border: 1px solid #999;
+        padding: 4px 12px;
+    }
+&lt;/style&gt;
+&lt;table&gt;
+    &lt;tr&gt;&lt;th&gt;項目&lt;/th&gt;&lt;th&gt;金額&lt;/th&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;td&gt;早餐&lt;/td&gt;&lt;td&gt;60&lt;/td&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;td&gt;午餐&lt;/td&gt;&lt;td&gt;120&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;</pre><div class="preview"><div class="lab">畫面</div><iframe title="HTML 的畫面" sandbox="allow-scripts allow-same-origin allow-popups" loading="lazy"></iframe></div></div>
+
+<p><code>border-collapse: collapse</code> 的意思是「相鄰格子的框合併」。按「改改看」把這一行刪掉，就會看到每一格各自有框、中間變成雙線。</p>
+<div class="secq" data-ch="2" data-isec="s2-6"></div>
+<h3 id="s2-7">2.7 區塊元素和行內元素</h3>
+<p>第 1 章說 <code>div</code> 會獨佔一行、<code>span</code> 不會。原因是每個元素都有一個預設的<b>顯示方式</b>（<code>display</code>）：</p>
+<div class="tbl"><table>
+<tr><th></th><th>區塊元素（block）</th><th>行內元素（inline）</th></tr>
+<tr><td>例子</td><td><code>div</code>、<code>p</code>、<code>h1</code>～<code>h6</code>、<code>ul</code>、<code>li</code>、<code>table</code></td><td><code>span</code>、<code>a</code>、<code>strong</code>、<code>img</code></td></tr>
+<tr><td>排列方式</td><td>獨佔一整行，下一個元素一定從下一行開始</td><td>像文字一樣排在同一行，排滿了才換行</td></tr>
+<tr><td>寬度</td><td>沒設的話，自動撐滿父元素的寬度</td><td>跟著內容一樣寬</td></tr>
+<tr><td>能不能設 <code>width</code>、<code>height</code></td><td>可以</td><td><b>不行</b>，設了也沒用（<code>img</code> 例外）</td></tr>
+</table></div>
+<div class="code html"><div class="bar"><span class="lab">HTML</span><button data-edit>改改看</button><button data-undo hidden>還原</button></div><pre tabindex="0">&lt;style&gt;
+    div, span {
+        border: 1px solid #e53935;
+        width: 120px;
+    }
+&lt;/style&gt;
+&lt;div&gt;div 一&lt;/div&gt;
+&lt;div&gt;div 二&lt;/div&gt;
+&lt;span&gt;span 一&lt;/span&gt;
+&lt;span&gt;span 二&lt;/span&gt;</pre><div class="preview"><div class="lab">畫面</div><iframe title="HTML 的畫面" sandbox="allow-scripts allow-same-origin allow-popups" loading="lazy"></iframe></div></div>
+
+<p>兩個 <code>div</code> 上下排，各佔一行，寬度照設定的 120px（加上框）。兩個 <code>span</code> 排在同一行，寬度只跟著文字，<code>width: 120px</code> 對它們完全沒有作用。</p>
+<h4>用 display 改變顯示方式</h4>
+<p>元素預設是哪一種，可以用 <code>display</code> 屬性改掉：</p>
+<div class="tbl"><table>
+<tr><th>寫法</th><th>效果</th></tr>
+<tr><td><code>display: block;</code></td><td>變成區塊元素。例如讓 <code>a</code> 連結獨佔一行、可以設寬高，做成大按鈕</td></tr>
+<tr><td><code>display: inline;</code></td><td>變成行內元素。例如讓 <code>li</code> 排成一排</td></tr>
+<tr><td><code>display: inline-block;</code></td><td>排在同一行，但可以設寬高，兩者的優點都有</td></tr>
+<tr><td><code>display: none;</code></td><td>整個<b>不顯示</b>，也不佔空間，就像不存在一樣</td></tr>
+</table></div>
+<p><code>display: none</code> 很重要，第 11 章 Vue 的 <code>v-show</code> 就是用它把東西藏起來的。下一節的 <code>display: flex</code> 則是現在排版的主力。</p>
+<div class="secq" data-ch="2" data-isec="s2-7"></div>
+<h3 id="s2-8">2.8 Flexbox：把東西排成一排</h3>
+<p>做網頁時最常遇到的排版需求：把幾個東西排成橫的一排，例如「項目在左邊、金額在右邊」。區塊元素會一個疊一個往下排，做不到這件事。這時用 <b>Flexbox</b>：在<b>父元素</b>加上 <code>display: flex</code>，它的子元素就會改成橫向排列。</p>
+<div class="code html"><div class="bar"><span class="lab">HTML</span><button data-edit>改改看</button><button data-undo hidden>還原</button></div><pre tabindex="0">&lt;style&gt;
+    .row {
+        display: flex;
+        border: 1px solid #999;
+    }
+&lt;/style&gt;
+&lt;div class="row"&gt;
+    &lt;div&gt;早餐&lt;/div&gt;
+    &lt;div&gt;60 元&lt;/div&gt;
+&lt;/div&gt;</pre><div class="preview"><div class="lab">畫面</div><iframe title="HTML 的畫面" sandbox="allow-scripts allow-same-origin allow-popups" loading="lazy"></iframe></div></div>
+
+<p>兩個 <code>div</code> 本來會上下排，現在變成左右排了。注意 <code>display: flex</code> 是加在<b>外面那一層</b>（<code>.row</code>）身上，被影響的是<b>它的子元素</b>。</p>
+<p>接下來用幾個屬性調整子元素怎麼排。這些屬性也都寫在父元素上：</p>
+<div class="code html"><div class="bar"><span class="lab">記帳列表的一行</span><button data-edit>改改看</button><button data-undo hidden>還原</button></div><pre tabindex="0">&lt;style&gt;
+    * {
+        box-sizing: border-box;
+    }
+    .row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        border-bottom: 1px solid #ddd;
+    }
+    .money {
+        font-size: 20px;
+        font-weight: bold;
+    }
+&lt;/style&gt;
+&lt;div class="row"&gt;
+    &lt;span&gt;早餐&lt;/span&gt;
+    &lt;span class="money"&gt;60&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="row"&gt;
+    &lt;span&gt;午餐&lt;/span&gt;
+    &lt;span class="money"&gt;120&lt;/span&gt;
+&lt;/div&gt;</pre><div class="preview"><div class="lab">畫面</div><iframe title="記帳列表的一行 的畫面" sandbox="allow-scripts allow-same-origin allow-popups" loading="lazy"></iframe></div></div>
+
+<div class="tbl"><table>
+<tr><th>屬性</th><th>管什麼</th><th>常用的值</th></tr>
+<tr><td><code>justify-content</code></td><td>子元素在<b>橫向</b>怎麼分配</td><td><code>flex-start</code>（靠左，預設）、<code>center</code>（置中）、<code>flex-end</code>（靠右）、<code>space-between</code>（第一個靠最左、最後一個靠最右，剩下的空間平分在中間）</td></tr>
+<tr><td><code>align-items</code></td><td>子元素在<b>直向</b>怎麼對齊</td><td><code>stretch</code>（拉成一樣高，預設）、<code>center</code>（垂直置中）</td></tr>
+<tr><td><code>gap</code></td><td>子元素之間的間距</td><td><code>8px</code></td></tr>
+<tr><td><code>flex-direction</code></td><td>排列方向</td><td><code>row</code>（橫排，預設）、<code>column</code>（直排）</td></tr>
+</table></div>
+<p>上面的例子：<code>space-between</code> 讓項目靠左、金額靠右；<code>align-items: center</code> 讓字比較大的金額和項目垂直對齊在中間。按「改改看」，把 <code>space-between</code> 換成 <code>center</code> 或 <code>flex-end</code>，看看差別。</p>
+<h4>讓某一個子元素佔滿剩下的空間</h4>
+<p>在<b>子元素</b>上加 <code>flex: 1</code>，它就會撐開、吃掉剩下的所有空間。常用在「輸入框佔滿、按鈕在右邊」這種版面：</p>
+<div class="code html"><div class="bar"><span class="lab">HTML</span><button data-edit>改改看</button><button data-undo hidden>還原</button></div><pre tabindex="0">&lt;style&gt;
+    .add {
+        display: flex;
+        gap: 8px;
+    }
+    .add input {
+        flex: 1;
+    }
+&lt;/style&gt;
+&lt;div class="add"&gt;
+    &lt;input placeholder="項目"&gt;
+    &lt;button&gt;新增&lt;/button&gt;
+&lt;/div&gt;</pre><div class="preview"><div class="lab">畫面</div><iframe title="HTML 的畫面" sandbox="allow-scripts allow-same-origin allow-popups" loading="lazy"></iframe></div></div>
+
+<div class="box trap"><span class="t">陷阱</span><p>初學者最常見的錯：把 <code>display: flex</code> 加在想要排成一排的那幾個元素<b>自己身上</b>。它要加在<b>包住它們的父元素</b>上。同樣地，<code>justify-content</code>、<code>align-items</code>、<code>gap</code> 也都寫在父元素上；只有 <code>flex: 1</code> 寫在子元素上。</p></div>
+<div class="box key"><span class="t">重點</span><p>Flexbox 三步驟：①在父元素加 <code>display: flex</code> ②用 <code>justify-content</code> 調橫向、<code>align-items</code> 調直向 ③用 <code>gap</code> 調間距。</p></div>
+<div class="secq" data-ch="2" data-isec="s2-8"></div>
+<h3 id="s2-9">2.9 用開發者工具看 CSS</h3>
+<p>CSS 沒照你想的生效時，打開開發者工具的 Elements 分頁，點選那個元素，看右邊（或下面）的 <b>Styles</b> 面板。這裡會列出所有選到這個元素的規則：</p>
+<ul class="pts">
+<li><b>被劃掉的宣告</b>：有被選到，但打架打輸了（2.4 節）。往上看，會有另一條規則設定了同一個屬性並且贏了它。</li>
+<li><b>被劃掉、旁邊還有黃色警告圖示的宣告</b>：不是打輸，而是瀏覽器看不懂這個宣告，例如 <code>16 px</code>、全形冒號、拼錯字。把滑鼠移到圖示上會顯示原因。2.2 和 2.5 節的錯誤在這裡都看得到。</li>
+<li><b>完全沒出現你寫的規則</b>：選擇器根本沒選到這個元素。檢查 class 名稱有沒有拼錯、點和井字號有沒有寫對。</li>
+</ul>
+<p>Styles 面板最下面（或 <b>Computed</b> 分頁裡）有一張盒子模型的圖，用不同顏色標出內容、內距、邊框、外距各是多少 px。2.6 節的寬度問題，看這張圖最清楚。</p>
+<p>在 Styles 面板裡可以直接點值來改、勾掉前面的勾勾暫時關掉某個宣告，畫面會馬上變。跟 Elements 改 HTML 一樣，這些改動<b>不會存回你的檔案</b>，試出想要的效果後，要回 VS Code 改。</p>
+<div class="box key"><span class="t">重點</span><p>CSS 沒生效，照順序查：①Styles 裡有沒有出現這條規則（沒有＝選擇器沒選到）②有沒有黃色警告圖示（有＝宣告寫錯了）③有沒有被劃掉（只劃掉沒警告＝打輸了）。</p></div>
+<div class="secq" data-ch="2" data-isec="s2-9"></div>
+<h3 id="s2-10">2.10 本章整理</h3>
+<ul class="pts">
+<li>CSS 三種寫法：<code>&lt;style&gt;</code> 元素（放在 head）、外部 <code>.css</code> 檔用 <code>&lt;link rel="stylesheet"&gt;</code> 引入、元素的 <code>style</code> 屬性（盡量少用）。</li>
+<li>規則 ＝ 選擇器 ＋ <code>{ 屬性: 值; }</code>。寫錯不會報錯，看不懂的宣告會被跳過；漏了分號會連下一個宣告一起失效。不要用全形符號。</li>
+<li>選擇器：<code>p</code>（標籤）、<code>.money</code>（class）、<code>#total</code>（id）、<code>.card span</code>（<code>.card</code> 裡的 <code>span</code>）、<code>h1, h2</code>（群組）。點和井字號只寫在 CSS 裡。</li>
+<li>打架時：<code>style</code> 屬性 ＞ id ＞ class ＞ 標籤；一樣具體時，CSS 裡後寫的贏。文字類屬性會繼承，盒子類不會。</li>
+<li>顏色可以用英文名稱、<code>#rrggbb</code>、<code>rgb()</code>。<code>font-size</code> 的 <code>%</code> 相對於父元素的文字大小。數字和單位之間不能有空白。</li>
+<li>盒子模型由內到外：內容 → padding → border → margin。<code>border</code> 要寫樣式（如 <code>solid</code>）才看得到。加上 <code>* { box-sizing: border-box; }</code>，<code>width</code> 就包含內距和邊框。</li>
+<li>區塊元素獨佔一行、可設寬高；行內元素排在同一行、設寬高沒用。<code>display</code> 可以改，<code>display: none</code> 會整個不顯示。</li>
+<li>Flexbox：父元素加 <code>display: flex</code>，子元素橫排。<code>justify-content</code> 調橫向、<code>align-items</code> 調直向、<code>gap</code> 調間距；子元素加 <code>flex: 1</code> 撐滿剩下的空間。</li>
+<li>CSS 沒生效，用開發者工具的 Styles 面板查：沒出現、有黃色警告圖示、被劃掉。</li>
+</ul>
+</article>
+    <div class="toquiz btnrow"><button class="btn main" id="goQuiz">念完了，開始做題</button><button class="btn reset" id="inReset" hidden></button></div>
+  </div>
+  <div id="quizPane" hidden></div>
+</section>
+</main>
+</div>
+<script>
+const BOOK = {"chapters": [{"no": 0, "t": "開始之前：寫網頁需要什麼", "d": "瀏覽器、VS Code、第一個網頁檔、開發者工具", "nq": 15, "ready": true, "secs": [{"id": "s0-1", "t": "0.1 網頁是由什麼組成的"}, {"id": "s0-2", "t": "0.2 安裝兩個軟體：瀏覽器和 VS Code"}, {"id": "s0-3", "t": "0.3 做出第一個網頁檔"}, {"id": "s0-4", "t": "0.4 改程式的循環：改 → 存 → 重新整理"}, {"id": "s0-5", "t": "0.5 瀏覽器的開發者工具"}, {"id": "s0-6", "t": "0.6 本章整理"}]}, {"no": 1, "t": "HTML：網頁的骨架", "d": "標籤、檔案架構、屬性、清單表格、表單元素、div 與 class", "nq": 25, "ready": true, "secs": [{"id": "s1-1", "t": "1.1 標籤：HTML 的基本單位"}, {"id": "s1-2", "t": "1.2 一份網頁檔的基本架構"}, {"id": "s1-3", "t": "1.3 元素裡面放元素，以及空白和換行"}, {"id": "s1-4", "t": "1.4 屬性：連結和圖片"}, {"id": "s1-5", "t": "1.5 清單和表格"}, {"id": "s1-6", "t": "1.6 讓使用者輸入：表單元素"}, {"id": "s1-7", "t": "1.7 分區用的 div、span，以及 id 和 class"}, {"id": "s1-8", "t": "1.8 註解，以及用開發者工具看 HTML"}, {"id": "s1-9", "t": "1.9 本章整理"}]}, {"no": 2, "t": "CSS：網頁的外觀", "d": "規則寫法、選擇器、誰會贏、盒子模型、Flexbox 排版", "nq": 25, "ready": true, "secs": [{"id": "s2-1", "t": "2.1 CSS 寫在哪裡"}, {"id": "s2-2", "t": "2.2 一條 CSS 規則的寫法"}, {"id": "s2-3", "t": "2.3 選擇器：指定要改哪些元素"}, {"id": "s2-4", "t": "2.4 兩條規則打架時，誰會贏"}, {"id": "s2-5", "t": "2.5 顏色和文字"}, {"id": "s2-6", "t": "2.6 盒子模型：每個元素都是一個盒子"}, {"id": "s2-7", "t": "2.7 區塊元素和行內元素"}, {"id": "s2-8", "t": "2.8 Flexbox：把東西排成一排"}, {"id": "s2-9", "t": "2.9 用開發者工具看 CSS"}, {"id": "s2-10", "t": "2.10 本章整理"}]}, {"no": 3, "t": "JavaScript 第一步", "d": "變數、數字和文字、console.log", "ready": false}, {"no": 4, "t": "判斷與迴圈", "d": "if、比較運算、for、while", "ready": false}, {"no": 5, "t": "函式", "d": "定義與呼叫、參數、回傳值、箭頭函式", "ready": false}, {"no": 6, "t": "陣列與物件", "d": "存很多筆資料、map、filter、物件屬性", "ready": false}, {"no": 7, "t": "用 JavaScript 改網頁", "d": "DOM、事件、為什麼需要 Vue", "ready": false}, {"no": 8, "t": "第一個 Vue 程式", "d": "createApp、{{ }} 顯示資料", "ready": false}, {"no": 9, "t": "響應式資料", "d": "ref、資料一改畫面跟著變", "ready": false}, {"no": 10, "t": "綁定屬性與事件", "d": "v-bind、v-on", "ready": false}, {"no": 11, "t": "條件與清單", "d": "v-if、v-show、v-for、key", "ready": false}, {"no": 12, "t": "表單", "d": "v-model", "ready": false}, {"no": 13, "t": "自動計算與監看", "d": "computed、watch", "ready": false}, {"no": 14, "t": "元件", "d": "把畫面拆成小積木、props、emit", "ready": false}, {"no": 15, "t": "用 Vite 建立專案", "d": "Node.js、npm、.vue 單檔元件", "ready": false}, {"no": 16, "t": "跟後端要資料", "d": "fetch、async/await、載入中與錯誤", "ready": false}, {"no": 17, "t": "多頁面", "d": "Vue Router", "ready": false}, {"no": 18, "t": "總實作：小記帳網頁", "d": "把全書學的東西組起來", "ready": false}], "q": {"0": [{"tag": "三種語言分工", "sec": "s0-1", "inline": true, "q": "網頁上「按下按鈕後跳出一段訊息」這件事，主要是哪一種語言負責的？", "o": [["JavaScript", 1, "JavaScript 管網頁「會做什麼」，按下按鈕後發生的事就是它負責。"], ["HTML", 0, "HTML 只負責網頁上「有什麼」，例如放一個按鈕。按下去之後要做什麼，HTML 管不到。"], ["CSS", 0, "CSS 負責外觀，例如按鈕的顏色和大小，不負責按下去之後的動作。"], ["Vue", 0, "Vue 是用 JavaScript 寫成的工具，不是另一種語言。這件事歸根究柢還是 JavaScript 在做。"]], "k": "HTML 管有什麼、CSS 管長什麼樣、JavaScript 管會做什麼。", "h": "題目問的是「動作」，三種語言裡哪一種管動作？"}, {"tag": "三種語言分工", "sec": "s0-1", "q": "想把網頁上的標題改成紅色、字放大，要寫哪一種？", "o": [["CSS", 1, "顏色和大小都是外觀，外觀歸 CSS 管。"], ["HTML", 0, "HTML 決定「這裡有一個標題」，但標題長什麼顏色、多大，交給 CSS。"], ["JavaScript", 0, "JavaScript 也做得到，但這是外觀問題，正常的做法是寫 CSS。第 7 章會看到 JavaScript 怎麼改樣式，那是為了「按下按鈕後才變色」這種會動的情況。"], ["Console", 0, "Console 是開發者工具裡的一個分頁，不是語言。"]], "k": "外觀（顏色、大小、位置）用 CSS。", "h": "這是「有什麼」、「長什麼樣」還是「會做什麼」？"}, {"tag": "Vue 是什麼", "sec": "s0-1", "q": "關於 Vue，下列哪一個說法正確？", "o": [["Vue 是用 JavaScript 寫成的工具，所以要先學會 JavaScript", 1, "Vue 的程式碼本身就是 JavaScript，不懂 JavaScript 就看不懂 Vue。"], ["Vue 是第四種語言，可以取代 HTML", 0, "Vue 不是新語言，也取代不了 HTML。用 Vue 寫的網頁裡仍然到處是 HTML。"], ["學 Vue 就不用學 CSS", 0, "外觀還是要靠 CSS，Vue 不管顏色和排版。"], ["Vue 是一種瀏覽器", 0, "瀏覽器是 Chrome、Edge 這些。Vue 是在瀏覽器裡跑的工具。"]], "k": "Vue 建立在 HTML、CSS、JavaScript 之上，所以本書先教這三樣，第 8 章才進 Vue。", "h": "Vue 的程式是用什麼語言寫的？"}, {"tag": "該用哪個軟體寫", "sec": "s0-2", "inline": true, "q": "下列哪一個最適合拿來寫網頁的程式碼？", "o": [["VS Code", 1, "VS Code 是寫程式用的編輯器，會上色、自動補字，存的是純文字。"], ["Mac 的文字編輯（TextEdit）", 0, "它預設存成有排版資料的格式，瀏覽器讀到的不是你打的那些字。"], ["Word", 0, "Word 存的 .docx 裡面有大量排版資料，不是純文字，瀏覽器看不懂。"], ["Chrome", 0, "Chrome 是用來「打開」網頁的，不是用來寫程式碼的。"]], "k": "程式碼一定要存成純文字。VS Code 是專門寫程式的編輯器。", "h": "想想哪一個軟體存出來的是「純文字」。"}, {"tag": "Edge 與 Chrome", "sec": "s0-2", "q": "Windows 的使用者沒有裝 Chrome，只有內建的 Edge，可以照本書練習嗎？", "o": [["可以，Edge 和 Chrome 用同一個核心，畫面和按鍵幾乎一樣", 1, "書裡講 Chrome 的地方，在 Edge 上大多照樣適用。"], ["不行，一定要裝 Chrome", 0, "不用。Edge 和 Chrome 的核心相同，開發者工具也幾乎一樣。"], ["不行，Edge 打不開 .html 檔", 0, "Edge 可以打開 .html 檔。"], ["可以，但 Edge 沒有開發者工具", 0, "Edge 也有開發者工具，一樣按 F12 打開。"]], "k": "Chrome 和 Edge 核心相同，任選一個都可以。", "h": "0.2 節說 Edge 和 Chrome 是什麼關係？"}, {"tag": "副檔名", "sec": "s0-3", "inline": true, "q": "網頁檔的副檔名應該是哪一個？", "o": [["`.html`", 1, "網頁檔的副檔名是 .html，瀏覽器看到它就會當成網頁來畫。"], ["`.txt`", 0, ".txt 是純文字檔，瀏覽器會原封不動顯示文字，不會畫成網頁。"], ["`.docx`", 0, ".docx 是 Word 檔。"], ["`.vue`", 0, ".vue 是第 15 章才會用到的 Vue 元件檔，瀏覽器不能直接打開它。"]], "k": "網頁檔要存成 `.html`。", "h": "0.3 節建立的檔案叫什麼名字？"}, {"tag": "副檔名被藏起來", "sec": "s0-3", "inline": true, "q": "小明在 Windows 上用記事本存了一個檔，看起來叫 `index.html`，雙擊打開後，瀏覽器卻顯示一整片原封不動的程式碼，連 `<h1>` 都看得到。最可能的原因是什麼？", "o": [["檔案其實叫 `index.html.txt`，Windows 把最後的 `.txt` 藏起來了", 1, "Windows 預設隱藏副檔名，記事本又常存成 .txt，所以真正的檔名多了 .txt，瀏覽器就把它當純文字。"], ["`<h1>` 寫錯了", 0, "標籤打錯不會讓整份程式碼都顯示出來。這種「全部原樣顯示」的情況，是瀏覽器根本沒把它當網頁。"], ["瀏覽器太舊了", 0, "再舊的瀏覽器都看得懂 <h1>。"], ["沒有開網路", 0, "打開自己電腦裡的檔案不需要網路。"]], "k": "畫面上看到整片原始程式碼，先檢查真正的副檔名。Windows 要先在檔案總管打開「顯示副檔名」。", "h": "瀏覽器把它當成什麼檔了？"}, {"tag": "內容寫在哪", "sec": "s0-3", "q": "用 VS Code 產生樣板之後，想顯示在網頁上的文字應該寫在哪裡？", "o": [["`<body>` 和 `<\/body>` 中間", 1, "body 是網頁的「身體」，畫面上看到的東西都寫在這裡。"], ["`<head>` 和 `<\/head>` 中間", 0, "head 放的是給瀏覽器看的設定，例如網頁標題、文字編碼，不會顯示在頁面內容裡。第 1 章會細講。"], ["`<!DOCTYPE html>` 的前面", 0, "這一行要放在檔案的最上面，前面不要放東西。"], ["`<\/html>` 的後面", 0, "<\/html> 代表整份網頁結束了，內容不該寫在它後面。"]], "k": "要給人看的內容放 `<body>` 裡。", "h": "body 這個英文字是什麼意思？"}, {"tag": "樣板快捷", "sec": "s0-3", "q": "在 VS Code 的 `index.html` 裡，打哪一個字再按 Enter，會自動產生網頁樣板？", "o": [["`!`", 1, "打驚嘆號後會出現提示，按 Enter 或 Tab 就會展開成整份樣板。"], ["`?`", 0, "問號沒有這個功能。"], ["`@`", 0, "@ 沒有這個功能。"], ["`Ctrl＋N`", 0, "這是開新檔案的快速鍵，不會產生樣板。"]], "k": "在 `.html` 檔裡打 `!` 再按 Enter，會產生樣板。檔案要先存成 `.html`，VS Code 才知道要這樣展開。", "h": "0.3 節的第三步打了哪一個符號？"}, {"tag": "改了沒變", "sec": "s0-4", "inline": true, "q": "小美在 VS Code 改了標題，回到瀏覽器按了重新整理，畫面卻還是舊的。VS Code 上方檔名旁邊有一個白色圓點。問題出在哪裡？", "o": [["還沒存檔", 1, "白色圓點代表檔案還沒存。瀏覽器讀的是硬碟裡的舊檔案，所以畫面沒變。"], ["瀏覽器壞了", 0, "瀏覽器沒問題，它讀到的就是舊檔案。"], ["要重開電腦", 0, "不用，存檔後再重新整理就好。"], ["標題不能改", 0, "標題當然可以改。"]], "k": "改 → 存 → 重新整理，三步缺一不可。檔名旁有白色圓點表示還沒存。", "h": "那個白色圓點代表什麼？"}, {"tag": "重新整理", "sec": "s0-4", "q": "在 Mac 的 Chrome 重新整理頁面，要按哪一個快速鍵？", "o": [["Cmd＋R", 1, "R 是 Reload（重新載入）。Windows 是 F5 或 Ctrl＋R。"], ["Cmd＋S", 0, "Cmd＋S 是存檔，在 VS Code 裡用。"], ["Cmd＋Option＋I", 0, "這是打開開發者工具。"], ["Cmd＋W", 0, "這會關掉目前的分頁。"]], "k": "存檔是 Cmd＋S（Windows 是 Ctrl＋S），重新整理是 Cmd＋R（Windows 是 F5 或 Ctrl＋R）。", "h": "重新整理的英文是 Reload。"}, {"tag": "為什麼要重新整理", "sec": "s0-4", "q": "為什麼存檔之後，還要回瀏覽器按重新整理？", "o": [["瀏覽器只在打開或重新整理時讀檔案，不會自己發現檔案變了", 1, "瀏覽器讀完檔案就照著畫，之後檔案怎麼變它都不知道，要重新整理才會再讀一次。"], ["重新整理才會把檔案存進硬碟", 0, "存檔是 VS Code 的工作，瀏覽器不會幫你存檔。"], ["不重新整理的話檔案會壞掉", 0, "不會壞，只是畫面停在舊的。"], ["這是 Windows 才需要的步驟", 0, "Mac 和 Windows 都要重新整理。"]], "k": "瀏覽器不會盯著你的檔案。改完存檔，要按重新整理才看得到新結果。", "h": "瀏覽器什麼時候會去讀你的檔案？"}, {"tag": "打開開發者工具", "sec": "s0-5", "inline": true, "q": "在 Windows 的 Chrome 打開開發者工具，下列哪一個方法可以？", "o": [["按 F12", 1, "Windows 按 F12 或 Ctrl＋Shift＋I 都可以。也可以在網頁上按右鍵選「檢查」。"], ["按 F5", 0, "F5 是重新整理。"], ["按 Ctrl＋S", 0, "這是存檔，而且在瀏覽器裡按會跳出「另存網頁」。"], ["在網址列打 devtools", 0, "這樣會被當成搜尋文字送出去，不會打開開發者工具。"]], "k": "開發者工具：Windows 按 F12，Mac 按 Cmd＋Option＋I，或右鍵選「檢查」。", "h": "0.5 節的表格裡，Windows 的快速鍵是哪一個？"}, {"tag": "Elements 改的東西", "sec": "s0-5", "q": "在開發者工具的 Elements 分頁裡，把標題文字改掉，畫面也跟著變了。接著按重新整理，會發生什麼事？", "o": [["標題變回檔案裡原本的文字", 1, "在 Elements 改的只是瀏覽器裡那一份，沒有寫回檔案。重新整理會重新讀檔案，所以變回原樣。"], ["標題維持改過的文字，而且檔案也被改了", 0, "開發者工具不會改到你的檔案。"], ["網頁變成一片空白", 0, "重新整理會正常重新讀檔、畫出原本的內容。"], ["瀏覽器會問你要不要存檔", 0, "瀏覽器不會問，改過的內容直接就不見了。"]], "k": "Elements 適合「先試試看」。真的要改，要回 VS Code 改檔案、存檔。", "h": "重新整理時，瀏覽器讀的是哪裡的內容？"}, {"tag": "Console 的用途", "sec": "s0-5", "q": "程式跑不出預期的結果時，到開發者工具的哪一個分頁看錯誤訊息最直接？", "o": [["Console", 1, "JavaScript 的錯誤會用紅字顯示在 Console，會告訴你錯在哪一行。"], ["Elements", 0, "Elements 看的是 HTML 結構和 CSS，JavaScript 的錯誤訊息不在這裡。"], ["網址列", 0, "網址列只顯示網址。"], ["VS Code 的檔案總管", 0, "檔案總管只列出檔案，看不到瀏覽器裡發生的錯誤。"]], "k": "有問題先看 Console 有沒有紅字。", "h": "Console 會顯示 JavaScript 的哪兩種東西？"}], "1": [{"tag": "元素的組成", "sec": "s1-1", "inline": true, "q": "`<p>午餐 120 元<\/p>` 這一整段叫做什麼？", "o": [["一個元素", 1, "開始標籤 <p>、內容「午餐 120 元」、結束標籤 <\/p>，三個合起來叫一個元素。"], ["一個屬性", 0, "屬性是寫在開始標籤裡的額外資訊，例如 href=\"…\"。這裡沒有屬性。"], ["兩個元素", 0, "<p> 和 <\/p> 是同一個元素的頭和尾，不是兩個元素。"], ["一個註解", 0, "註解要用 <!-- --> 包起來。"]], "k": "元素 ＝ 開始標籤 ＋ 內容 ＋ 結束標籤。", "h": "`<p>` 和 `<\/p>` 是同一個東西的頭和尾嗎？"}, {"tag": "結束標籤", "sec": "s1-1", "q": "下列哪一個是正確的結束標籤？", "o": [["`<\/h2>`", 1, "結束標籤是在名稱前面加一條斜線。"], ["`<h2/>`", 0, "斜線放錯位置了。結束標籤的斜線要在名稱前面。"], ["`<\\h2>`", 0, "這是反斜線 \\，不是斜線 /。"], ["`<end h2>`", 0, "HTML 沒有這種寫法。"]], "k": "結束標籤 ＝ `<` ＋ `/` ＋ 名稱 ＋ `>`。", "h": "斜線是哪一個方向、放在哪裡？"}, {"tag": "漏了斜線", "sec": "s1-1", "q": "下面這段程式碼，畫面上會有幾個 `h1` 元素？", "code": "<h1>記帳<h1>\n<p>早餐 60 元<\/p>", "o": [["2 個", 1, "第二個 <h1> 少了斜線，瀏覽器把它當成另一個大標題的開始，所以有兩個 h1。後面的段落也變成被包在第二個 h1 裡面。"], ["1 個", 0, "如果第二個寫成 <\/h1> 才會只有一個。這裡少了斜線。"], ["0 個，瀏覽器會顯示錯誤", 0, "HTML 寫錯不會顯示錯誤，瀏覽器會自己猜怎麼修。"], ["3 個", 0, "只有兩個 <h1> 開始標籤，<p> 不是 h1。"]], "k": "結束標籤漏了斜線，就變成另一個元素的開始。", "h": "數一數有幾個 `<h1>` 開始標籤。"}, {"tag": "head 和 body", "sec": "s1-2", "inline": true, "q": "`<title>記帳本<\/title>` 裡的「記帳本」會顯示在哪裡？", "o": [["瀏覽器的分頁標籤上", 1, "title 是網頁的名稱，顯示在分頁標籤和書籤上，不顯示在頁面裡。"], ["頁面最上方的大標題", 0, "頁面上的大標題要用 <h1>。title 寫在 head 裡，不會出現在頁面內容中。"], ["頁面最下方", 0, "不會出現在頁面裡。"], ["不會顯示在任何地方", 0, "它會顯示在分頁標籤上。"]], "k": "`<title>` 在分頁標籤上，`<h1>` 在頁面上，兩個不一樣。", "h": "`<title>` 寫在 `<head>` 還是 `<body>` 裡？"}, {"tag": "meta charset", "sec": "s1-2", "q": "網頁上的中文變成一堆「ä»Šå¤©」這種亂碼，最可能是少了哪一行？", "o": [["`<meta charset=\"UTF-8\">`", 1, "沒告訴瀏覽器檔案的編碼，瀏覽器猜錯就會變亂碼。"], ["`<!DOCTYPE html>`", 0, "它告訴瀏覽器這是現代 HTML，跟中文編碼無關。"], ["`<meta name=\"viewport\" …>`", 0, "viewport 管的是手機上的顯示寬度，不是編碼。"], ["`<html lang=\"zh-Hant\">`", 0, "lang 只是說明網頁的語言，不會決定瀏覽器怎麼解讀檔案的編碼。"]], "k": "`meta charset` 告訴瀏覽器檔案的編碼，少了它中文可能變亂碼。", "h": "亂碼代表瀏覽器把文字「解讀」錯了，哪一行在講怎麼解讀？"}, {"tag": "內容寫在哪", "sec": "s1-2", "q": "下列哪一個元素應該寫在 `<head>` 裡，而不是 `<body>` 裡？", "o": [["`<meta charset=\"UTF-8\">`", 1, "meta 是給瀏覽器看的設定，放在 head。"], ["`<h1>記帳本<\/h1>`", 0, "h1 是要顯示在頁面上的大標題，放在 body。"], ["`<p>早餐 60 元<\/p>`", 0, "段落要顯示給人看，放在 body。"], ["`<button>新增<\/button>`", 0, "按鈕要顯示在頁面上，放在 body。"]], "k": "head 放給瀏覽器看的設定（meta、title），body 放給人看的內容。", "h": "哪一個不是給人看的？"}, {"tag": "巢狀規則", "sec": "s1-3", "inline": true, "q": "下列哪一個寫法的巢狀是正確的？", "o": [["`<p>花了 <strong>60 元<\/strong><\/p>`", 1, "strong 先關、p 後關，strong 完整包在 p 裡。"], ["`<p>花了 <strong>60 元<\/p><\/strong>`", 0, "p 先關了，strong 還沒關，兩個交叉了。"], ["`<strong><p>花了 60 元<\/strong><\/p>`", 0, "先開的 strong 卻先關，p 還沒關，交叉了。"], ["`<p>花了 <strong>60 元<\/p>`", 0, "strong 沒有關。"]], "k": "先開的後關。裡面的元素要完整包在外面的元素裡。", "h": "看最後兩個結束標籤的順序，是不是跟開始標籤的順序相反？"}, {"tag": "縮排", "sec": "s1-3", "q": "把一段 HTML 的縮排全部拿掉、所有東西寫成一行，畫面會怎樣？", "o": [["完全一樣", 1, "縮排和換行只是給人看的，瀏覽器不在乎。"], ["全部擠在一起變得很亂", 0, "標題、段落還是各自一塊，因為它們是不同元素。被合併的只有空白和換行字元。"], ["瀏覽器會報錯", 0, "不會報錯。"], ["只剩第一行會顯示", 0, "所有內容都會顯示。"]], "k": "縮排只給人看。寫程式要縮排，是為了讓人看得懂誰包著誰。", "h": "1.3 節的兩種 body 寫法，畫面一不一樣？"}, {"tag": "空白合併", "sec": "s1-3", "inline": true, "q": "下面這段，畫面上會怎麼顯示？", "code": "<p>牛奶\n雞蛋\n麵包<\/p>", "o": [["一行：「牛奶 雞蛋 麵包」", 1, "程式碼裡的換行被當成一個空白，三個詞接成一行。"], ["分成三行", 0, "在程式碼裡按 Enter 不會讓畫面換行。要換行得用 <br> 或分成不同的 p。"], ["一行：「牛奶雞蛋麵包」，中間沒有空白", 0, "換行會變成一個空白，不是直接消失。"], ["只顯示「牛奶」", 0, "三個詞都在同一個 p 裡，都會顯示。"]], "k": "換行和連續空白在畫面上只算一個空白。", "h": "換行字元在 HTML 裡被當成什麼？"}, {"tag": "br", "sec": "s1-3", "q": "想讓地址在同一段裡分成兩行顯示，該怎麼寫？", "code": "<p>台中市西區<br>民權路 100 號<\/p>", "o": [["在要換行的地方放 `<br>`", 1, "br 會在原地強制換行，適合同一段文字要分行的情況。"], ["在程式碼裡按 Enter 換行就好", 0, "程式碼裡的換行在畫面上只會變成一個空白。"], ["寫成 `<br>民權路 100 號<\/br>`", 0, "br 是空元素，沒有結束標籤，也不包內容。"], ["打很多個空白把字擠到下一行", 0, "連續空白只算一個空白。"]], "k": "同一段裡要換行用 `<br>`，它沒有結束標籤。", "h": "哪一個元素是 break（斷開）的縮寫？"}, {"tag": "屬性寫法", "sec": "s1-4", "inline": true, "q": "`<a href=\"about.html\">關於我<\/a>` 裡，哪一部分是「屬性名稱」？", "o": [["`href`", 1, "href 是屬性名稱，意思是連到哪裡。"], ["`a`", 0, "a 是標籤名稱。"], ["`\"about.html\"`", 0, "這是屬性的值。"], ["`關於我`", 0, "這是元素的內容，也就是畫面上可以點的文字。"]], "k": "屬性寫在開始標籤裡：`名稱=\"值\"`。", "h": "等號左邊是什麼？"}, {"tag": "連結文字", "sec": "s1-4", "q": "`<a href=\"https://vuejs.org/\">Vue 官網<\/a>`，畫面上會看到什麼？", "code": "<a href=\"https://vuejs.org/\">Vue 官網<\/a>", "o": [["可以點的「Vue 官網」四個字", 1, "顯示的是 a 元素的內容，網址藏在 href 裡。"], ["網址 https://vuejs.org/", 0, "網址不會顯示，只有內容會顯示。"], ["「Vue 官網」加上網址", 0, "只顯示內容。"], ["什麼都看不到，要點了才會出現", 0, "內容會直接顯示成一段可以點的文字。"]], "k": "連結畫面上顯示的是元素內容；網址寫在 `href` 裡，不顯示。", "h": "標籤和屬性會不會顯示在畫面上？"}, {"tag": "alt", "sec": "s1-4", "inline": true, "q": "`<img>` 的 `alt` 屬性有什麼用？", "o": [["圖片無法顯示時顯示的替代文字，報讀軟體也會念它", 1, "alt 是 alternative（替代）的縮寫。"], ["設定圖片的位置", 0, "圖片的位置寫在 src。"], ["設定圖片的寬度", 0, "寬度用 width。"], ["滑鼠移上去時圖片會放大", 0, "alt 沒有這個功能。"]], "k": "每張圖都要有 `alt`：圖片載入失敗會顯示它，看不到畫面的人也靠它知道圖片內容。", "h": "alt 是哪個英文字的縮寫？"}, {"tag": "相對網址", "sec": "s1-4", "q": "資料夾長這樣，在 `index.html` 裡要顯示 `dog.jpg`，`src` 該寫什麼？", "code": "vue-book/\n├── index.html\n└── images/\n    └── dog.jpg", "o": [["`images/dog.jpg`", 1, "從 index.html 所在的資料夾開始，先進 images，再找 dog.jpg。"], ["`dog.jpg`", 0, "這樣會在 index.html 同一層找 dog.jpg，但它在 images 裡面。"], ["`vue-book/dog.jpg`", 0, "相對網址是從 index.html 所在的資料夾開始，不用再寫 vue-book；而且 dog.jpg 在 images 裡。"], ["`dog.jpg/images`", 0, "順序反了。要先寫資料夾、再寫檔名。"]], "k": "相對網址從目前 HTML 檔所在的資料夾開始找，用 `/` 往資料夾裡面走。", "h": "從 index.html 出發，要先進哪個資料夾？"}, {"tag": "ul 和 ol", "sec": "s1-5", "inline": true, "q": "要做一份「1. 燒水 2. 放麵 3. 煮三分鐘」這種有編號的步驟清單，外層要用哪個標籤？", "o": [["`ol`", 1, "ol 是有順序的清單，瀏覽器會自動編號。"], ["`ul`", 0, "ul 是沒有順序的清單，前面是圓點，不是編號。"], ["`li`", 0, "li 是清單裡的每一項，外面還需要 ul 或 ol 包著。"], ["`table`", 0, "table 是表格，不是清單。"]], "k": "有順序用 `ol`（自動編號），沒順序用 `ul`（圓點），每一項都是 `li`。", "h": "o 是 ordered（有順序的）。"}, {"tag": "清單項目數", "sec": "s1-5", "q": "下面的清單，畫面上會有幾個項目？", "code": "<ul>\n    <li>牛奶<\/li>\n    <li>雞蛋<\/li>\n    <li>麵包<\/li>\n<\/ul>", "o": [["3 個", 1, "有三個 li，每個 li 是一項。"], ["1 個", 0, "ul 是整個清單，裡面有三項。"], ["4 個", 0, "ul 本身不算一項，只有 li 才是項目。"], ["0 個，因為沒有編號", 0, "ul 本來就不編號，用圓點標示每一項。"]], "k": "一個 `li` 就是一項。", "h": "數一數 `li`。"}, {"tag": "表格結構", "sec": "s1-5", "q": "HTML 表格裡，`tr` 代表什麼？", "o": [["一列（橫的一整排）", 1, "tr 是 table row，一個 tr 是一列，裡面放這一列的每一格。"], ["一欄（直的一整排）", 0, "HTML 表格沒有欄的標籤，欄是由每一列的第幾格對齊出來的。"], ["一個資料格", 0, "資料格是 td。"], ["標題格", 0, "標題格是 th。"]], "k": "表格一列一列寫：`tr` 是一列，裡面放 `th`（標題格）或 `td`（資料格）。", "h": "r 是 row。"}, {"tag": "input 的 type", "sec": "s1-6", "inline": true, "q": "想要一個「只能輸入數字」的輸入框，要怎麼寫？", "code": "<input type=\"number\">", "o": [["`<input type=\"number\">`", 1, "換 type 就換輸入框的種類，number 是數字框。"], ["`<number>`", 0, "HTML 沒有 number 這個標籤。"], ["`<input type=\"text\">`", 0, "text 是一般文字框，什麼都能打。"], ["`<input>數字<\/input>`", 0, "input 是空元素，沒有結束標籤。"]], "k": "同一個 `input`，換 `type` 屬性就變成不同種類的輸入框。", "h": "輸入框都是同一個標籤，差在哪個屬性？"}, {"tag": "label 和 for", "sec": "s1-6", "inline": true, "q": "下面這段，使用者點了「已付款」這幾個字，會發生什麼事？", "code": "<input id=\"paid\" type=\"checkbox\">\n<label for=\"paid\">已付款<\/label>", "o": [["勾選框被打勾", 1, "label 的 for 對上了勾選框的 id，點文字就等於點勾選框。"], ["什麼事都沒有，只有點那個框才有用", 0, "有 for 連起來時，點文字也有效。"], ["文字變成粗體", 0, "label 不會改變文字樣式。"], ["跳到另一個頁面", 0, "label 不是連結。"]], "k": "`label` 的 `for` 寫輸入框的 `id`，兩者就綁在一起，點文字等於點框。", "h": "`for=\"paid\"` 指向誰？"}, {"tag": "placeholder 和 value", "sec": "s1-6", "q": "`<input type=\"text\" placeholder=\"例如：早餐\">`，使用者什麼都還沒打的時候，這個框的值是什麼？", "code": "<input type=\"text\" placeholder=\"例如：早餐\">", "o": [["空的，什麼都沒有", 1, "placeholder 只是淡淡的提示字，不算值。要一開始就有值要用 value。"], ["「例如：早餐」", 0, "框裡雖然看得到這幾個字，但那只是提示，不是值。"], ["「placeholder」", 0, "屬性名稱不會變成值。"], ["「text」", 0, "type 決定框的種類，不是值。"]], "k": "`placeholder` 是提示字，一打字就消失，不算值；`value` 才是值。", "h": "一開始就填好的值是用哪個屬性？"}, {"tag": "布林屬性", "sec": "s1-6", "q": "下面這個勾選框，一打開網頁時有沒有打勾？", "code": "<input type=\"checkbox\" checked=\"false\">", "o": [["有打勾", 1, "checked 是布林屬性，瀏覽器只看有沒有寫它，不看值。寫了 \"false\" 仍然算有寫。"], ["沒有打勾，因為值是 false", 0, "布林屬性不看值。要不打勾，就整個不要寫 checked。"], ["瀏覽器會報錯", 0, "不會報錯。"], ["會變成灰色不能點", 0, "不能點是另一個屬性 disabled 的效果。"]], "k": "布林屬性只看「有沒有寫」。", "h": "瀏覽器看的是值，還是有沒有這個屬性？"}, {"tag": "div 和 span", "sec": "s1-7", "inline": true, "q": "想把「金額數字」這一小段文字包起來，好讓它之後變成紅色，又不想讓它換行，該用哪一個？", "o": [["`span`", 1, "span 包一行文字裡的一小段，不會換行。"], ["`div`", 0, "div 會獨佔一整行，數字會被擠到下一行。"], ["`p`", 0, "p 是一個段落，也會獨佔一行。"], ["`h1`", 0, "h1 是大標題，有自己的意思，而且會獨佔一行。"]], "k": "`div` 包一大塊、會獨佔一行；`span` 包一小段、不換行。", "h": "哪一個是「一小段」的意思？"}, {"tag": "id 和 class", "sec": "s1-7", "q": "同一頁有 5 張記帳卡片，想讓它們全部套用同一個樣式，要替它們加上什麼？", "o": [["同一個 `class`，例如 `class=\"card\"`", 1, "class 代表「這一類」，可以很多元素共用。"], ["同一個 `id`，例如 `id=\"card\"`", 0, "id 全頁只能出現一次，不能 5 個元素用同一個。"], ["各自不同的 `class`", 0, "各自不同的話，就不能一次指定它們全部。"], ["什麼都不用加，div 會自動套用", 0, "要指定是哪些元素，就要替它們取名字。"]], "k": "多個元素共用用 `class`；`id` 全頁唯一。", "h": "哪一個可以重複出現？"}, {"tag": "多個 class", "sec": "s1-7", "q": "`<div class=\"card expensive\">` 這個元素有幾個 class？", "code": "<div class=\"card expensive\">晚餐<\/div>", "o": [["2 個：`card` 和 `expensive`", 1, "class 裡的空白用來分隔好幾個 class。"], ["1 個，叫「card expensive」", 0, "class 名稱不能有空白，空白是分隔符號。"], ["0 個，寫法錯誤", 0, "這是正確的寫法。"], ["1 個，叫 `card`，後面的被忽略", 0, "兩個都有效。"]], "k": "一個元素可以有好幾個 class，用空白隔開。", "h": "class 裡的空白是什麼意思？"}, {"tag": "註解", "sec": "s1-8", "inline": true, "q": "下面這段，畫面上會看到幾個段落？", "code": "<p>早餐 60 元<\/p>\n<!-- <p>午餐 120 元<\/p> -->\n<p>晚餐 200 元<\/p>", "o": [["2 個", 1, "午餐那一行被 <!-- --> 包住變成註解，瀏覽器不會畫它。"], ["3 個", 0, "中間那一行是註解，不會顯示。"], ["1 個", 0, "只有中間那一行被註解掉，早餐和晚餐都會顯示。"], ["0 個，註解後面的全部不顯示", 0, "註解只到 --> 為止，後面的照常顯示。"]], "k": "`<!--` 到 `-->` 之間的東西都不會顯示。", "h": "註解從哪裡開始、到哪裡結束？"}], "2": [{"tag": "CSS 寫在哪", "sec": "s2-1", "inline": true, "q": "在 HTML 檔裡直接寫 CSS 規則，要寫在哪一個元素裡？", "o": [["`<style>`", 1, "<style> 和 <\/style> 中間寫的是 CSS，通常放在 head 裡。"], ["`<css>`", 0, "HTML 沒有 css 這個標籤。"], ["`<link>`", 0, "link 是用來引入「另一個 .css 檔」的，它自己裡面不寫 CSS。"], ["`<script>`", 0, "script 是放 JavaScript 的，第 3 章才會用到。"]], "k": "CSS 寫在 `<style>` 裡，或寫在獨立的 `.css` 檔再用 `<link rel=\"stylesheet\">` 引入。", "h": "這個元素的名字就是「樣式」的英文。"}, {"tag": "外部 css 檔", "sec": "s2-1", "q": "網站有 10 頁，想讓每一頁的標題都用同一個顏色，而且之後只改一個地方就能全部一起改，最好的做法是？", "o": [["寫在一個 `.css` 檔，每一頁用 `<link>` 引進來", 1, "所有頁面共用同一個檔，改一次全部生效。"], ["每一頁的 `<h1>` 都寫 `style=\"color: …\"`", 0, "要改的時候得 10 頁一個一個找，最難管理。"], ["每一頁各自寫一個 `<style>`", 0, "要改的時候還是得改 10 個地方。"], ["用 `<title>` 設定顏色", 0, "title 是分頁標籤上的名稱，跟顏色無關。"]], "k": "多頁共用的樣式放在獨立的 `.css` 檔。", "h": "哪一種做法只要改一個檔？"}, {"tag": "規則的組成", "sec": "s2-2", "inline": true, "q": "在 `p { color: red; }` 這條規則裡，`color` 是什麼？", "o": [["屬性", 1, "color 是要改的「什麼」：文字顏色。"], ["選擇器", 0, "選擇器是大括號前面的 p，決定要改哪些元素。"], ["值", 0, "值是冒號後面的 red。"], ["元素", 0, "元素是 HTML 裡的東西，這裡寫的是 CSS。"]], "k": "規則 ＝ 選擇器 ＋ `{ 屬性: 值; }`。", "h": "冒號左邊是什麼？"}, {"tag": "漏了分號", "sec": "s2-2", "q": "下面的 CSS，段落最後會是什麼顏色、多大？", "code": "<style>\n    p {\n        font-size: 30px;\n        color: red\n        font-weight: bold;\n    }\n<\/style>\n<p>早餐<\/p>", "o": [["30px、黑色、不是粗體", 1, "font-size 寫對了，有生效。color: red 少了分號，和下一行黏成一個看不懂的值，兩個一起被丟掉。"], ["30px、紅色、粗體", 0, "color 那行少了分號，它和 font-weight 都失效了。"], ["30px、紅色、不是粗體", 0, "少分號的是 color 那一行，所以 color 自己也失效了，不只下一行。"], ["整條規則都失效，16px、黑色", 0, "瀏覽器只跳過看不懂的宣告，前面寫對的 font-size 仍然有效。"]], "k": "漏了分號，這一行和下一行會黏在一起，兩個宣告一起失效；其他寫對的照常套用。", "h": "少了分號後，瀏覽器讀到的 color 值是什麼？"}, {"tag": "全形符號", "sec": "s2-2", "q": "`p { color：red; }` 這條規則為什麼沒效果？", "code": "<style>\n    p { color：red; }\n<\/style>\n<p>早餐<\/p>", "o": [["冒號是全形的 `：`，瀏覽器不認得", 1, "中文輸入法打出的全形冒號，電腦把它當成完全不同的字。"], ["`red` 要寫成大寫", 0, "顏色名稱大小寫都可以。"], ["要寫在 `style` 屬性裡才有效", 0, "寫在 <style> 裡是正確的寫法。"], ["`p` 前面要加點", 0, "加點是 class 選擇器，選 p 元素不用加。"]], "k": "寫程式要用英文輸入法，全形符號會讓宣告失效。", "h": "仔細看 color 後面那個符號。"}, {"tag": "class 選擇器", "sec": "s2-3", "inline": true, "q": "HTML 是 `<span class=\"money\">60<\/span>`，CSS 要怎麼選到它？", "o": [["`.money`", 1, "class 選擇器前面加一個點。"], ["`#money`", 0, "井字號是 id 選擇器，這個元素沒有 id。"], ["`money`", 0, "不加符號會被當成標籤選擇器，去找 <money> 這種元素。"], ["`class=money`", 0, "這是 HTML 的寫法，CSS 不這樣寫。"]], "k": "class 用 `.名稱`，id 用 `#名稱`，標籤直接寫名稱。", "h": "class 選擇器前面要加什麼符號？"}, {"tag": "後代選擇器", "sec": "s2-3", "q": "下面的 CSS，畫面上哪幾個數字會有黃底？", "code": "<style>\n    .card span { background-color: yellow; }\n<\/style>\n<div class=\"card\">\n    <p>早餐 <span>60<\/span><\/p>\n<\/div>\n<p>午餐 <span>120<\/span><\/p>", "o": [["只有 60", 1, ".card span 是「.card 裡面的 span」。60 在 .card 裡，120 不在。"], ["只有 120", 0, "120 不在 .card 裡面。"], ["60 和 120 都有", 0, "這樣要寫 span 才會選到所有 span。"], ["都沒有，因為 span 在 p 裡面不是直接在 .card 裡", 0, "後代選擇器不管隔幾層，只要在裡面就選得到。"]], "k": "`A B` 選的是「A 裡面（不管第幾層）的 B」。", "h": "120 那個 span 在不在 .card 裡面？"}, {"tag": "點寫在哪", "sec": "s2-3", "q": "下面的 CSS 為什麼沒讓「60」變紅？", "code": "<style>\n    .money { color: red; }\n<\/style>\n<span class=\".money\">60<\/span>", "o": [["HTML 的 class 不該加點，應寫 `class=\"money\"`", 1, "點只寫在 CSS 選擇器裡。這裡的 class 名稱變成了「.money」，跟 CSS 要找的 money 對不上。"], ["CSS 應該寫 `..money`", 0, "沒有這種寫法。正確的修法是把 HTML 的點拿掉。"], ["span 不能套顏色", 0, "span 可以套顏色。"], ["要用 id 才能改顏色", 0, "class 也可以改顏色。"]], "k": "點和井字號只出現在 CSS 裡。HTML 寫 `class=\"money\"`，CSS 寫 `.money`。", "h": "點應該出現在 HTML 還是 CSS 裡？"}, {"tag": "具體程度", "sec": "s2-4", "inline": true, "q": "下面的段落最後是什麼顏色？", "code": "<style>\n    #total { color: green; }\n    .money { color: red; }\n    p { color: blue; }\n<\/style>\n<p id=\"total\" class=\"money\">合計<\/p>", "o": [["綠色", 1, "三條都選到它，id 最具體，所以 #total 贏。"], ["藍色，因為 p 寫在最後", 0, "「後寫的贏」只在一樣具體時才用。這三條具體程度不同，id 最強。"], ["紅色，因為 class 比標籤強", 0, "class 比標籤強沒錯，但 id 又比 class 強。"], ["三種顏色混在一起", 0, "同一個屬性只會有一個值生效。"]], "k": "id ＞ class ＞ 標籤。具體程度比寫的順序重要。", "h": "先比具體程度，一樣時才比順序。"}, {"tag": "後寫的贏", "sec": "s2-4", "inline": true, "q": "下面的段落最後是什麼顏色？", "code": "<style>\n    .highlight { color: orange; }\n    .money { color: red; }\n<\/style>\n<p class=\"money highlight\">60 元<\/p>", "o": [["紅色", 1, "兩條都是 class，一樣具體，CSS 裡後寫的 .money 贏。"], ["橘色，因為 HTML 裡 highlight 寫在後面", 0, "比的是 CSS 規則的順序，不是 HTML 裡 class 名字的順序。"], ["黑色，兩條互相抵消", 0, "不會抵消，一定有一個贏。"], ["橘色，因為 highlight 寫在 CSS 第一行最重要", 0, "一樣具體時，是後寫的贏，不是先寫的。"]], "k": "一樣具體時，看 CSS 裡誰寫在後面。HTML 裡 class 名字的順序不影響。", "h": "要比的是哪裡的順序？"}, {"tag": "style 屬性", "sec": "s2-4", "q": "下面的段落最後是什麼顏色？", "code": "<style>\n    #total { color: green; }\n<\/style>\n<p id=\"total\" style=\"color: purple;\">合計<\/p>", "o": [["紫色", 1, "直接寫在元素上的 style 屬性，比所有選擇器都強，連 id 也贏不了它。"], ["綠色，因為 id 最強", 0, "id 是選擇器裡最強的，但 style 屬性比任何選擇器都強。"], ["黑色", 0, "兩個都有設定，一定有一個贏。"], ["綠色，因為 style 元素寫在前面", 0, "這跟順序無關，style 屬性一律比選擇器強。"]], "k": "`style` 屬性 ＞ id ＞ class ＞ 標籤。", "h": "直接寫在元素上的樣式有多強？"}, {"tag": "繼承", "sec": "s2-4", "q": "下面的 `strong` 是什麼顏色？有沒有自己的框？", "code": "<style>\n    .card { color: purple; border: 2px solid gray; }\n<\/style>\n<div class=\"card\"><p>早餐 <strong>60<\/strong><\/p><\/div>", "o": [["紫色，沒有自己的框", 1, "color 是文字類屬性，會繼承；border 是盒子類屬性，不會繼承。"], ["紫色，也有自己的框", 0, "border 不會繼承，只有 .card 自己有框。"], ["黑色，沒有框", 0, "strong 沒設顏色，會繼承父元素的紫色。"], ["黑色，有框", 0, "顏色會繼承、框不會，剛好相反。"]], "k": "文字類屬性（color、font-size）會繼承，盒子類屬性（border、padding、margin）不會。", "h": "color 和 border 哪一個是文字類？"}, {"tag": "顏色寫法", "sec": "s2-5", "inline": true, "q": "下列哪一個不是合法的 CSS 顏色寫法？", "o": [["`color: 紅色;`", 1, "CSS 的顏色名稱要用英文，中文看不懂，宣告會被跳過。"], ["`color: red;`", 0, "英文名稱是合法的。"], ["`color: #ff0000;`", 0, "十六進位是合法的，這就是紅色。"], ["`color: rgb(255, 0, 0);`", 0, "rgb 是合法的，也是紅色。"]], "k": "顏色可以寫英文名稱、`#rrggbb`、`rgb(紅, 綠, 藍)`。", "h": "CSS 認得中文嗎？"}, {"tag": "百分比字級", "sec": "s2-5", "q": "父元素的文字是 20px，子元素寫 `font-size: 150%`，子元素的字有多大？", "code": "<style>\n    div { font-size: 20px; }\n    span { font-size: 150%; }\n<\/style>\n<div><span>60<\/span><\/div>", "o": [["30px", 1, "font-size 的 % 相對於父元素的文字大小：20 × 1.5 ＝ 30。"], ["24px", 0, "24px 是父元素為預設 16px 時的答案。這裡父元素是 20px。"], ["150px", 0, "% 不是直接換成 px。"], ["150% 不是合法的值", 0, "% 是合法的單位。"]], "k": "`font-size` 的 `%` 是相對於父元素的文字大小。", "h": "150% 是誰的 1.5 倍？"}, {"tag": "單位與空白", "sec": "s2-5", "q": "`p { font-size: 24 px; }` 的結果是什麼？", "code": "<style>\n    p { font-size: 24 px; }\n<\/style>\n<p>早餐<\/p>", "o": [["這個宣告被跳過，字維持預設的 16px", 1, "數字和單位之間不能有空白，24 px 是看不懂的值。"], ["字變成 24px", 0, "中間有空白就不合法了。"], ["字變成 24 倍大", 0, "不合法的值會被跳過，不會被猜成別的意思。"], ["整個網頁都不顯示", 0, "CSS 寫錯只會跳過那一個宣告。"]], "k": "數字和單位要黏在一起：`24px`。", "h": "數字和 px 之間能不能有空白？"}, {"tag": "盒子模型層次", "sec": "s2-6", "inline": true, "q": "盒子模型由內到外的順序是？", "o": [["內容 → padding → border → margin", 1, "內距在框裡面，外距在框外面。"], ["內容 → margin → border → padding", 0, "margin 是最外面那層，padding 在框的裡面。"], ["border → padding → 內容 → margin", 0, "內容在最裡面。"], ["padding → 內容 → border → margin", 0, "內容在最裡面，padding 包著它。"]], "k": "想像裱框的畫：畫（內容）→ 白邊（padding）→ 畫框（border）→ 牆面空隙（margin）。", "h": "背景色會塗到 padding 嗎？那 padding 在框的裡面還是外面？"}, {"tag": "盒子寬度", "sec": "s2-6", "inline": true, "q": "下面的 `.card` 沒有設 `box-sizing`，它在畫面上實際有多寬？", "code": "<style>\n    .card { width: 300px; padding: 10px; border: 5px solid green; margin: 20px; }\n<\/style>\n<div class=\"card\">早餐<\/div>", "o": [["330px", 1, "預設 width 只算內容：5 ＋ 10 ＋ 300 ＋ 10 ＋ 5 ＝ 330。margin 不算在盒子寬度裡。"], ["300px", 0, "加上 box-sizing: border-box 才會是 300。"], ["370px", 0, "這把 margin 也算進去了。margin 是盒子外面的空隙，不算盒子寬度。"], ["315px", 0, "左右兩邊都要算，padding 和 border 各要乘以 2。"]], "k": "預設的寬度 ＝ 左右 border ＋ 左右 padding ＋ width。margin 不算。", "h": "左右兩邊都要算。"}, {"tag": "border-box", "sec": "s2-6", "q": "同一張卡片，加上 `box-sizing: border-box` 之後實際多寬？", "code": "<style>\n    .card { box-sizing: border-box; width: 300px; padding: 10px; border: 5px solid green; }\n<\/style>\n<div class=\"card\">早餐<\/div>", "o": [["300px", 1, "border-box 讓 width 包含 padding 和 border，內容區自動縮成 270px。"], ["330px", 0, "這是沒有 border-box 時的寬度。"], ["270px", 0, "270 是內容區的寬度，整個盒子是 300。"], ["330px，但內容區變大", 0, "border-box 讓整個盒子剛好等於 width。"]], "k": "加上 `box-sizing: border-box`，設多寬就是多寬。", "h": "border-box 的意思是 width 算到哪一層為止？"}, {"tag": "border 要寫樣式", "sec": "s2-6", "q": "`border: 2px green;` 為什麼看不到框？", "code": "<style>\n    div { border: 2px green; }\n<\/style>\n<div>早餐<\/div>", "o": [["少了框的樣式，例如 `solid`，預設樣式是沒有框", 1, "border 要有粗細、樣式、顏色，樣式省略時是 none。"], ["綠色不能用在框上", 0, "框可以是任何顏色。"], ["2px 太細了", 0, "2px 看得到，問題是沒有指定樣式。"], ["div 不能加框", 0, "div 可以加框。"]], "k": "`border` 一定要寫樣式：`border: 2px solid green;`。", "h": "三件事少了哪一件？"}, {"tag": "區塊和行內", "sec": "s2-7", "inline": true, "q": "下面兩個 `span` 都設了 `width: 200px`，結果會怎樣？", "code": "<style>\n    span { width: 200px; border: 1px solid red; }\n<\/style>\n<span>早餐<\/span><span>午餐<\/span>", "o": [["排在同一行，寬度跟著文字，width 沒有作用", 1, "span 是行內元素，設寬高沒用。"], ["上下排，各 200px 寬", 0, "這是區塊元素的行為。span 是行內元素。"], ["排在同一行，各 200px 寬", 0, "行內元素不吃 width，除非改成 inline-block。"], ["什麼都不顯示", 0, "會正常顯示，只是 width 沒效果。"]], "k": "行內元素（`span`、`a`、`strong`）排在同一行，設 `width` 沒用。", "h": "span 是區塊元素還是行內元素？"}, {"tag": "display none", "sec": "s2-7", "q": "`display: none` 的效果是什麼？", "code": "<style>\n    .hide { display: none; }\n<\/style>\n<p>早餐<\/p><p class=\"hide\">午餐<\/p><p>晚餐<\/p>", "o": [["元素完全不顯示，也不佔空間", 1, "就像那個元素不存在一樣，下面的元素會往上補。"], ["元素變透明，但還佔著位置", 0, "那是另一個屬性 visibility: hidden 的效果，本章沒教。display: none 連位置都不留。"], ["元素被從 HTML 檔裡刪掉", 0, "CSS 不會改你的檔案，元素還在 HTML 裡，只是不畫出來。"], ["元素變成行內元素", 0, "那是 display: inline。"]], "k": "`display: none` 讓元素不顯示也不佔空間，第 11 章 `v-show` 就是靠它。", "h": "晚餐會往上補到午餐的位置嗎？"}, {"tag": "flex 加在誰身上", "sec": "s2-8", "inline": true, "q": "想讓三張卡片 `.card` 排成橫的一排，`display: flex` 要加在誰身上？", "code": "<style>\n    .list { display: flex; }\n<\/style>\n<div class=\"list\">\n    <div class=\"card\">早餐<\/div>\n    <div class=\"card\">午餐<\/div>\n    <div class=\"card\">晚餐<\/div>\n<\/div>", "o": [["包住它們的 `.list`", 1, "display: flex 加在父元素，被排成一排的是它的子元素。"], ["每一張 `.card`", 0, "加在卡片身上，影響的是卡片「裡面」的東西，卡片本身還是上下排。"], ["`body`", 0, "body 不是卡片的直接父元素，加在 body 只會影響 .list 這一層。"], ["只加在第一張 `.card`", 0, "這樣只會影響第一張卡片裡面的內容。"]], "k": "`display: flex` 加在父元素，它的子元素才會排成一排。", "h": "被排列的是誰的子元素？"}, {"tag": "space-between", "sec": "s2-8", "q": "想讓「項目」靠最左邊、「金額」靠最右邊，父元素除了 `display: flex`，還要加什麼？", "code": "<style>\n    .row { display: flex; justify-content: space-between; width: 300px; }\n<\/style>\n<div class=\"row\"><span>早餐<\/span><span>60<\/span><\/div>", "o": [["`justify-content: space-between;`", 1, "第一個靠最左、最後一個靠最右，剩下的空間平分在中間。"], ["`align-items: center;`", 0, "align-items 管直向的對齊，不管左右。"], ["`text-align: right;`", 0, "這是文字對齊，flex 子元素的排列要用 justify-content。"], ["`gap: 100%;`", 0, "gap 是固定的間距，不會自動把東西推到兩邊。"]], "k": "橫向分配用 `justify-content`，直向對齊用 `align-items`。", "h": "管橫向的是哪一個屬性？"}, {"tag": "flex 1", "sec": "s2-8", "q": "下面的輸入框為什麼會變得很寬？", "code": "<style>\n    .add { display: flex; gap: 8px; width: 400px; }\n    .add input { flex: 1; }\n<\/style>\n<div class=\"add\"><input><button>新增<\/button><\/div>", "o": [["`flex: 1` 讓它吃掉剩下的所有空間", 1, "按鈕用它需要的寬度，剩下的全給輸入框。"], ["`gap: 8px` 把它撐開了", 0, "gap 只是兩個子元素之間的 8px 間距。"], ["input 預設就是滿版的", 0, "input 預設是固定寬度，不會自己撐滿。"], ["`display: flex` 會讓所有子元素一樣寬", 0, "flex 不會自動讓子元素等寬，按鈕的寬度跟著文字。"]], "k": "子元素加 `flex: 1`，會撐滿剩下的空間。這是少數寫在子元素上的 flex 屬性。", "h": "哪一條寫在 input 身上？"}, {"tag": "開發者工具查 CSS", "sec": "s2-9", "inline": true, "q": "用開發者工具的 Styles 面板看，你寫的 `.money { color: red; }` 完全沒有出現在那個元素的規則清單裡。最可能的原因是什麼？", "o": [["選擇器沒選到這個元素，例如 class 名稱拼錯", 1, "只要選擇器有選到，就算打輸了也會出現在清單裡（被劃掉）。完全沒出現代表沒選到。"], ["被別的規則蓋過去了", 0, "被蓋過去的規則還是會出現，只是被劃掉。"], ["red 拼錯了", 0, "值寫錯的話，規則會出現，宣告旁邊會有黃色警告圖示。"], ["瀏覽器不支援 color", 0, "所有瀏覽器都支援 color。"]], "k": "沒出現＝選擇器沒選到；有黃色警告圖示＝宣告寫錯；只被劃掉＝打輸了。", "h": "打輸的規則會不會出現在清單裡？"}]}};
+// 課本導覽＋做題。進度只放 localStorage（失敗時仍可在本次瀏覽正常使用）。
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+const rich = s => esc(s).replace(/`([^`]+)`/g, "<code>$1</code>").replace(/\n/g, "<br>");
+const shuffle = n => { const a = [...Array(n).keys()]; for (let i = n - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const KEY = "vue-book-v1";
+let store = {};
+try { store = JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) {}
+const persist = () => { try { localStorage.setItem(KEY, JSON.stringify(store)); } catch (e) {} };
+const chState = n => (store["c" + n] = store["c" + n] || { a: {}, pos: 0 });
+const chapters = BOOK.chapters;
+const chapter = n => chapters.find(c => c.no === n);
+const qsOf = n => BOOK.q[n] || [];
+const stat = n => { const a = chState(n).a, v = Object.values(a); return { done: v.length, ok: v.filter(x => x.ok).length, total: qsOf(n).length }; };
+let cur = { ch: null, tab: "text" }, picked = new Set(), showHint = false;
+
+function renderToc(){
+  $("tocList").innerHTML = chapters.map(c => {
+    const on = cur.ch === c.no, s = stat(c.no);
+    const secs = on && c.secs ? `<ul class="secs">${c.secs.map(x => `<li><a href="#${x.id}" data-sec="${x.id}" data-ch="${c.no}">${esc(x.t)}</a></li>`).join("")}</ul>` : "";
+    return `<li><a href="#ch${c.no}" class="${on ? "on" : ""} ${c.ready ? "" : "off"}" ${c.ready ? `data-go="${c.no}"` : 'aria-disabled="true" tabindex="-1"'}><span class="no">${String(c.no).padStart(2, "0")}</span><span>${esc(c.t)}</span>${s.total ? `<span class="cnt">${s.done}/${s.total}</span>` : ""}</a>${secs}</li>`;
+  }).join("");
+  $("chList").innerHTML = chapters.map(c => {
+    const s = stat(c.no), inner = `<span class="n">${String(c.no).padStart(2, "0")}</span><span>${esc(c.t)}<small>${esc(c.d)}</small></span><span class="st">${c.ready ? (s.done ? `已做 ${s.done}/${s.total}` : "可以開始") : "製作中"}</span>`;
+    return `<li>${c.ready ? `<a href="#ch${c.no}" data-go="${c.no}">${inner}</a>` : `<div class="row">${inner}</div>`}</li>`;
+  }).join("");
+}
+function setHash(h){ try { history.replaceState(null, "", "#" + h); } catch (e) {} }
+function go(ch, tab, sec){
+  const home = ch === null, hasQ = !home && qsOf(ch).length > 0, hasText = !home && !!$("text" + ch);
+  cur = { ch, tab: hasQ ? (hasText ? tab || "text" : "quiz") : "text" };
+  $("home").hidden = !home; $("chapterView").hidden = home;
+  if (!home) {
+    const c = chapter(ch);
+    $("tabQuiz").hidden = !hasQ; $("tabText").hidden = !hasText; document.querySelector(".toquiz").hidden = !hasQ;
+    $("chNo").textContent = "第 " + ch + " 章"; $("tabQuiz").textContent = qsOf(ch).length + " 題練習"; $("chTitle").textContent = c.t;
+    document.querySelectorAll(".chapter").forEach(a => a.hidden = a.id !== "text" + ch); requestAnimationFrame(() => document.querySelectorAll("#text" + ch + " .code.html iframe").forEach(fitFrame));
+    $("textPane").hidden = cur.tab !== "text"; $("quizPane").hidden = cur.tab !== "quiz";
+    $("tabText").setAttribute("aria-selected", cur.tab === "text"); $("tabQuiz").setAttribute("aria-selected", cur.tab === "quiz");
+    if (cur.tab === "quiz") { picked = new Set(); showHint = false; renderQuiz(); }
+  }
+  renderInReset(); renderResetAll(); renderToc();
+  setHash(!home ? (sec || "ch" + ch + (cur.tab === "quiz" ? "-q" : "")) : "home");
+  if (sec) { const el = $(sec); if (el) { el.scrollIntoView(); return; } }
+  window.scrollTo(0, 0);
+}
+
+function optOrder(n, i){
+  const st = chState(n); st.o = st.o || {};
+  if (!st.o[i] || st.o[i].length !== qsOf(n)[i].o.length) { st.o[i] = shuffle(qsOf(n)[i].o.length); persist(); }
+  return st.o[i];
+}
+function renderQuiz(){
+  const n = cur.ch, qs = qsOf(n), st = chState(n), s = stat(n);
+  if (s.done === qs.length && st.pos >= qs.length) return renderResult();
+  const i = Math.min(st.pos, qs.length - 1), q = qs[i], ans = st.a[i], order = optOrder(n, i);
+  const gridHtml = qs.map((_, k) => `<button data-q="${k}" class="${st.a[k] ? (st.a[k].ok ? "ok" : "no") : ""} ${k === i ? "cur" : ""}" aria-label="第 ${k + 1} 題">${k + 1}</button>`).join("");
+  const opts = order.map((oi, p) => {
+    const o = q.o[oi], chosen = ans ? ans.p.includes(oi) : picked.has(oi);
+    const cls = ans ? (o[1] ? "right" : chosen ? "wrong" : "") : chosen ? "sel" : "";
+    return `<button class="opt ${cls}" data-o="${oi}" ${ans ? "disabled" : ""}><span class="L">${"ABCDEF"[p]}</span><span>${rich(o[0])}${ans ? `<span class="why">${rich(o[2])}</span>` : ""}</span></button>`;
+  }).join("");
+  const secCh = chapter(+((q.sec.match(/^s(\d+)-/) || [])[1] ?? n)) || chapter(n), sec = (secCh.secs || []).find(x => x.id === q.sec);
+  const exp = ans ? `<div class="verdict ${ans.ok ? "ok" : "no"}">${ans.ok ? "答對了" : "答錯了"}</div><div class="exp">
+    <h5>觀念</h5><p>${rich(q.k)}</p>
+    ${q.s ? `<h5>逐步拆解</h5><p>${rich(q.s)}</p>` : ""}${q.x ? `<h5>延伸</h5><p>${rich(q.x)}</p>` : ""}
+    ${sec ? `<h5>回課文</h5><p><button class="linkbtn" data-back="${q.sec}">${secCh.no !== n ? `第 ${secCh.no} 章 ` : ""}${esc(sec.t)}</button></p>` : ""}</div>` : "";
+  const last = i === qs.length - 1, allDone = s.done === qs.length;
+  const btns = ans
+    ? `<button class="btn main" id="nextQ">${allDone ? "看成績" : last ? "找下一題沒做的" : "下一題"}</button>`
+    : `${q.multi ? `<button class="btn main" id="submitQ" ${picked.size ? "" : "disabled"}>送出答案</button>` : ""}<button class="btn" id="hintQ">${showHint ? "收起提示" : "看提示"}</button>`;
+  const resetBtn = ans ? `<button class="btn reset" id="resetOne">這題重新開始</button>` : "";
+  $("quizPane").innerHTML = `<div class="qbar"><span>第 <b>${i + 1}</b> / ${qs.length} 題</span><span>已做 ${s.done}</span><span>答對 ${s.ok}</span></div>
+    <div class="grid">${gridHtml}</div>
+    <div class="qtag">${esc(q.tag)}${q.multi ? "（複選）" : ""}</div><div class="qtext">${rich(q.q)}</div>
+    ${q.code ? `<div class="code plain"><pre tabindex="0">${esc(q.code)}</pre></div>` : ""}
+    <div class="opts">${opts}</div>
+    ${showHint && !ans ? `<div class="hint">提示：${rich(q.h)}</div>` : ""}${exp}
+    <div class="btnrow">${btns}${resetBtn}</div>`;
+  renderResetAll();
+}
+function renderResetAll(){ const n = cur.ch; $("resetAll").hidden = n === null || cur.tab !== "quiz" || !stat(n).done; }
+function answer(p){
+  const n = cur.ch, st = chState(n), i = Math.min(st.pos, qsOf(n).length - 1), q = qsOf(n)[i];
+  const right = q.o.map((o, k) => o[1] ? k : -1).filter(k => k >= 0);
+  st.a[i] = { p, ok: right.length === p.length && right.every(k => p.includes(k)) };
+  persist(); picked = new Set(); showHint = false; renderQuiz(); renderToc();
+}
+function nextQuestion(){
+  const n = cur.ch, st = chState(n), total = qsOf(n).length;
+  picked = new Set(); showHint = false;
+  if (stat(n).done === total) { st.pos = st.pos + 1 >= total ? total : st.pos + 1; }
+  else { let k = st.pos + 1; while (k < total && st.a[k]) k++; if (k >= total) { k = 0; while (st.a[k]) k++; } st.pos = k; }
+  persist(); renderQuiz(); $("chapterView").scrollIntoView();
+}
+function renderResult(){
+  const n = cur.ch, qs = qsOf(n), st = chState(n), s = stat(n), tags = {};
+  qs.forEach((q, i) => { const t = tags[q.tag] = tags[q.tag] || { ok: 0, all: 0 }; t.all++; if (st.a[i] && st.a[i].ok) t.ok++; });
+  const rows = Object.entries(tags).sort((a, b) => a[1].ok / a[1].all - b[1].ok / b[1].all).map(([t, v]) => `<tr><td>${esc(t)}</td><td>${v.ok} / ${v.all}</td></tr>`).join("");
+  const wrong = s.total - s.ok;
+  $("quizPane").innerHTML = `<p class="bigscore">${s.ok} / ${s.total}</p>
+    <p>${wrong ? `答錯 ${wrong} 題。下面的表從最弱的主題排起，先回課文看最上面幾項，再重做錯題。` : "全部答對。可以進下一章了。"}</p>
+    <div class="tbl"><table class="tagtbl"><tr><th>主題</th><th>答對</th></tr>${rows}</table></div>
+    <div class="btnrow">${wrong ? `<button class="btn main" id="retryWrong">只重做答錯的 ${wrong} 題</button>` : ""}
+    <button class="btn" id="reviewQ">從第 1 題看解析</button>
+    <button class="btn" id="resetQ">全部重來</button></div>`;
+  renderResetAll();
+}
+// ---- 每節結尾的隨堂練習：題目取自本章章末練習，作答紀錄和 50 題分開 ----
+const inState = n => (store["i" + n] = store["i" + n] || { a: {}, o: {} });
+const inPicked = {}, inHint = {};
+function renderInReset(){
+  const b = $("inReset"), n = cur.ch;
+  b.hidden = n === null || !Object.keys((store["i" + n] || { a: {} }).a).length;
+  b.textContent = "隨堂練習重新開始";
+}
+function inResetClick(){
+  const n = cur.ch; store["i" + n] = { a: {}, o: {} };
+  Object.keys(inPicked).concat(Object.keys(inHint)).forEach(k => { if (k.startsWith(n + "-")) { delete inPicked[k]; delete inHint[k]; } });
+  persist(); document.querySelectorAll(`.secq[data-ch="${n}"]`).forEach(renderSecq); renderInReset();
+}
+function inOrder(n, i){
+  const st = inState(n);
+  if (!st.o[i] || st.o[i].length !== qsOf(n)[i].o.length) { st.o[i] = shuffle(qsOf(n)[i].o.length); persist(); }
+  return st.o[i];
+}
+function renderSecq(box){
+  const n = +box.dataset.ch, sec = box.dataset.isec, qs = qsOf(n), st = inState(n);
+  const list = qs.map((q, i) => i).filter(i => qs[i].inline && qs[i].sec === sec);
+  if (!list.length) { box.hidden = true; return; }
+  box.innerHTML = `<div class="secq-h"><span>隨堂練習</span><small>先試著自己作答。章末練習也有這${list.length > 1 ? "幾" : ""}題。</small></div>` + list.map((i, k) => {
+    const q = qs[i], ans = st.a[i], key = n + "-" + i, picked = inPicked[key] || new Set();
+    const opts = inOrder(n, i).map((oi, p) => {
+      const o = q.o[oi], chosen = ans ? ans.p.includes(oi) : picked.has(oi);
+      const cls = ans ? (o[1] ? "right" : chosen ? "wrong" : "") : chosen ? "sel" : "";
+      return `<button class="opt ${cls}" data-ii="${i}" data-io="${oi}" ${ans ? "disabled" : ""}><span class="L">${"ABCDEF"[p]}</span><span>${rich(o[0])}${ans ? `<span class="why">${rich(o[2])}</span>` : ""}</span></button>`;
+    }).join("");
+    const exp = ans ? `<div class="verdict ${ans.ok ? "ok" : "no"}">${ans.ok ? "答對了" : "答錯了"}</div><div class="exp"><h5>觀念</h5><p>${rich(q.k)}</p>${q.s ? `<h5>逐步拆解</h5><p>${rich(q.s)}</p>` : ""}</div>` : "";
+    const btns = ans ? `<button class="btn" data-iredo="${i}">再做一次</button>`
+      : `${q.multi ? `<button class="btn main" data-isub="${i}" ${picked.size ? "" : "disabled"}>送出答案</button>` : ""}<button class="btn" data-ihint="${i}">${inHint[key] ? "收起提示" : "看提示"}</button>`;
+    return `<div class="iq">${list.length > 1 ? `<div class="qtag">第 ${k + 1} 題・${esc(q.tag)}${q.multi ? "（複選）" : ""}</div>` : `<div class="qtag">${esc(q.tag)}${q.multi ? "（複選）" : ""}</div>`}
+      <div class="qtext">${rich(q.q)}</div>${q.code ? `<div class="code plain"><pre tabindex="0">${esc(q.code)}</pre></div>` : ""}
+      <div class="opts">${opts}</div>${inHint[key] && !ans ? `<div class="hint">提示：${rich(q.h)}</div>` : ""}${exp}
+      <div class="btnrow">${btns}</div></div>`;
+  }).join("");
+}
+function inAnswer(box, i, p){
+  const n = +box.dataset.ch, q = qsOf(n)[i], right = q.o.map((o, k) => o[1] ? k : -1).filter(k => k >= 0);
+  inState(n).a[i] = { p, ok: right.length === p.length && right.every(k => p.includes(k)) };
+  delete inPicked[n + "-" + i]; delete inHint[n + "-" + i]; persist(); renderSecq(box); renderInReset();
+}
+function secqClick(t, box){
+  const n = +box.dataset.ch, d = t.dataset;
+  if (d.io !== undefined) {
+    const i = +d.ii, key = n + "-" + i, oi = +d.io;
+    if (qsOf(n)[i].multi) { const s = inPicked[key] = inPicked[key] || new Set(); s.has(oi) ? s.delete(oi) : s.add(oi); renderSecq(box); }
+    else inAnswer(box, i, [oi]);
+  } else if (d.isub !== undefined) inAnswer(box, +d.isub, [...(inPicked[n + "-" + d.isub] || [])]);
+  else if (d.ihint !== undefined) { const key = n + "-" + d.ihint; inHint[key] = !inHint[key]; renderSecq(box); }
+  else if (d.iredo !== undefined) { const st = inState(n); delete st.a[d.iredo]; delete st.o[d.iredo]; persist(); renderSecq(box); renderInReset(); }
+}
+document.querySelectorAll(".secq").forEach(renderSecq);
+document.addEventListener("click", e => {
+  const box = e.target.closest(".secq");
+  if (box) { const b = e.target.closest("button"); if (b && !b.disabled) secqClick(b, box); return; }
+  const t = e.target.closest("[data-go],[data-sec],[data-tab],[data-q],[data-o],[data-back],button");
+  if (!t) return;
+  if (t.dataset.sec) { e.preventDefault(); go(+t.dataset.ch, "text", t.dataset.sec); closeToc(); return; }
+  if (t.dataset.go) { e.preventDefault(); go(t.dataset.go === "home" ? null : +t.dataset.go, "text"); closeToc(); return; }
+  if (t.dataset.tab) { go(cur.ch, t.dataset.tab); return; }
+  if (t.dataset.back) { go(+t.dataset.back.match(/^s(\d+)-/)[1], "text", t.dataset.back); return; }
+  const n = cur.ch, st = n !== null ? chState(n) : null;
+  if (t.dataset.q) { st.pos = +t.dataset.q; picked = new Set(); showHint = false; persist(); renderQuiz(); return; }
+  if (t.dataset.o !== undefined) {
+    const oi = +t.dataset.o, q = qsOf(n)[Math.min(st.pos, qsOf(n).length - 1)];
+    if (q.multi) { picked.has(oi) ? picked.delete(oi) : picked.add(oi); renderQuiz(); } else answer([oi]);
+    return;
+  }
+  switch (t.id) {
+    case "goQuiz": go(cur.ch, "quiz"); break;
+    case "inReset": inResetClick(); break;
+    case "submitQ": answer([...picked]); break;
+    case "hintQ": showHint = !showHint; renderQuiz(); break;
+    case "nextQ": nextQuestion(); break;
+    case "reviewQ": st.pos = 0; persist(); renderQuiz(); break;
+    case "retryWrong": {
+      Object.keys(st.a).forEach(k => { if (!st.a[k].ok) { delete st.a[k]; delete st.o[k]; } });
+      st.pos = qsOf(n).findIndex((_, k) => !st.a[k]); persist(); renderQuiz(); renderToc(); break;
+    }
+    case "resetOne": {
+      const i = Math.min(st.pos, qsOf(n).length - 1);
+      delete st.a[i]; if (st.o) delete st.o[i]; picked = new Set(); showHint = false; persist(); renderQuiz(); renderToc(); break;
+    }
+    case "resetAll":
+    case "resetQ":
+      store["c" + n] = { a: {}, pos: 0 }; picked = new Set(); showHint = false; persist(); renderQuiz(); renderToc(); break;
+  }
+});
+function closeToc(){ if (window.matchMedia("(max-width: 820px)").matches) $("tocBox").open = false; }
+if (window.matchMedia("(max-width: 820px)").matches) $("tocBox").open = false;
+(function boot(){
+  const h = location.hash.slice(1); let m;
+  if ((m = h.match(/^ch(\d+)(-q)?$/)) && chapter(+m[1]) && chapter(+m[1]).ready) go(+m[1], m[2] ? "quiz" : "text");
+  else if ((m = h.match(/^s(\d+)-\d+$/)) && chapter(+m[1]) && chapter(+m[1]).ready) go(+m[1], "text", h);
+  else go(null);
+})();
+
+// ---- HTML 範例：即時畫面＋改改看 ----
+function fitFrame(f){ try { const d = f.contentDocument; if (d && d.documentElement) f.style.height = Math.max(40, d.documentElement.scrollHeight) + "px"; } catch (e) {} }
+function paint(box){ const f = box.querySelector("iframe"), pre = box.querySelector("pre"); f.onload = () => { fitFrame(f); setTimeout(() => fitFrame(f), 300); }; const src = pre.textContent, m = src.match(/^\s*<!DOCTYPE[^>]*>/i); f.srcdoc = m ? m[0] + '<base target="_blank">' + src.slice(m[0].length) : '<base target="_blank">' + src; }
+document.querySelectorAll(".code.html").forEach(box => {
+  const pre = box.querySelector("pre"), orig = pre.innerHTML, edit = box.querySelector("[data-edit]"), undo = box.querySelector("[data-undo]");
+  paint(box);
+  let t; pre.addEventListener("input", () => { clearTimeout(t); t = setTimeout(() => paint(box), 250); });
+  edit.addEventListener("click", () => {
+    const on = !pre.hasAttribute("contenteditable");
+    if (on) { pre.setAttribute("contenteditable", "plaintext-only"); if (pre.contentEditable !== "plaintext-only") pre.setAttribute("contenteditable", "true"); pre.setAttribute("spellcheck", "false"); pre.focus(); }
+    else pre.removeAttribute("contenteditable");
+    edit.textContent = on ? "改完了" : "改改看"; undo.hidden = false;
+  });
+  undo.addEventListener("click", () => { pre.innerHTML = orig; paint(box); });
+});
+window.addEventListener("resize", () => document.querySelectorAll(".code.html iframe").forEach(fitFrame));
+
+</script>
