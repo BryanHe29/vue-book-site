@@ -1,0 +1,5 @@
+[
+  { "id": 1, "item": "早餐", "amount": 60, "type": "餐飲" },
+  { "id": 2, "item": "捷運", "amount": 35, "type": "交通" },
+  { "id": 3, "item": "午餐", "amount": 120, "type": "餐飲" }
+]
